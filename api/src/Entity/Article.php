@@ -44,4 +44,9 @@ class Article implements ContentInterface
 
         return $this;
     }
+
+    public function getAuthor(): ?object
+    {
+        return null;
+    }
 }
