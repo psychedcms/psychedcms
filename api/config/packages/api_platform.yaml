@@ -36,3 +36,4 @@ api_platform:
 
     mercure:
         enabled: true
+        hub_url: '%env(MERCURE_URL)%'
