@@ -2,6 +2,7 @@ version: '3'
 
 vars:
   COMPOSE_FILE: '{{.ROOT_DIR}}/docker-compose.yml'
+  PACKAGES_DIR: '{{.ROOT_DIR}}/packages'
 
 tasks:
   # ===========================================================================
@@ -121,7 +122,7 @@ tasks:
   test:core:
     desc: Run tests for psychedcms-core package
     cmds:
-      - docker compose -f {{.COMPOSE_FILE}} exec php bin/phpunit vendor/psychedcms/psychedcms-core/tests/
+      - docker compose -f {{.COMPOSE_FILE}} exec php bin/phpunit {{.PACKAGES_DIR}}/psychedcms-core/tests/
 
   # ===========================================================================
   # Git - psychedcms-core (atomic operations)
@@ -129,12 +130,12 @@ tasks:
   git:status:core:
     desc: Show git status for psychedcms-core
     cmds:
-      - echo "=== psychedcms-core ===" && git -C vendor/psychedcms/psychedcms-core status -s && git -C vendor/psychedcms/psychedcms-core log -1 --oneline
+      - echo "=== psychedcms-core ===" && git -C {{.PACKAGES_DIR}}/psychedcms-core status -s && git -C {{.PACKAGES_DIR}}/psychedcms-core log -1 --oneline
 
   git:branch:core:
     desc: Show current branch for psychedcms-core
     cmds:
-      - git -C vendor/psychedcms/psychedcms-core branch --show-current
+      - git -C {{.PACKAGES_DIR}}/psychedcms-core branch --show-current
 
 
   # Feature branch operations
@@ -143,14 +144,14 @@ tasks:
     vars:
       FEATURE: '{{.FEATURE}}'
     cmds:
-      - ../scripts/git-ensure-branch.sh vendor/psychedcms/psychedcms-core feature/{{.FEATURE}}
+      - ../scripts/git-ensure-branch.sh {{.PACKAGES_DIR}}/psychedcms-core feature/{{.FEATURE}}
 
   feature:checkout:core:
     desc: "Checkout feature branch on psychedcms-core"
     vars:
       FEATURE: '{{.FEATURE}}'
     cmds:
-      - git -C vendor/psychedcms/psychedcms-core checkout feature/{{.FEATURE}}
+      - git -C {{.PACKAGES_DIR}}/psychedcms-core checkout feature/{{.FEATURE}}
 
   # Commit operations (with lazy branch creation)
   commit:core:
@@ -162,30 +163,30 @@ tasks:
       - task: feature:ensure:core
         vars:
           FEATURE: '{{.FEATURE}}'
-      - cmd: 'git -C vendor/psychedcms/psychedcms-core add .'
-      - cmd: 'git -C vendor/psychedcms/psychedcms-core commit -m "[feature/{{.FEATURE}}] core: {{.MESSAGE}}"'
+      - cmd: 'git -C {{.PACKAGES_DIR}}/psychedcms-core add .'
+      - cmd: 'git -C {{.PACKAGES_DIR}}/psychedcms-core commit -m "[feature/{{.FEATURE}}] core: {{.MESSAGE}}"'
 
   # Push/Pull operations
   push:core:
     desc: Push psychedcms-core current branch
     cmds:
-      - git -C vendor/psychedcms/psychedcms-core push -u origin $(git -C vendor/psychedcms/psychedcms-core branch --show-current)
+      - git -C {{.PACKAGES_DIR}}/psychedcms-core push -u origin $(git -C {{.PACKAGES_DIR}}/psychedcms-core branch --show-current)
 
   pull:core:
     desc: 'Pull psychedcms-core (current branch or specified via BRANCH=x)'
     vars:
       BRANCH:
-        sh: echo "${BRANCH:-$(git -C vendor/psychedcms/psychedcms-core branch --show-current)}"
+        sh: echo "${BRANCH:-$(git -C {{.PACKAGES_DIR}}/psychedcms-core branch --show-current)}"
     cmds:
-      - git -C vendor/psychedcms/psychedcms-core checkout {{.BRANCH}}
-      - git -C vendor/psychedcms/psychedcms-core pull origin {{.BRANCH}}
+      - git -C {{.PACKAGES_DIR}}/psychedcms-core checkout {{.BRANCH}}
+      - git -C {{.PACKAGES_DIR}}/psychedcms-core pull origin {{.BRANCH}}
 
   rebase:core:
     desc: "Rebase current feature branch onto main on psychedcms-core (updates main, rebases, force pushes)"
     cmds:
-      - git -C vendor/psychedcms/psychedcms-core fetch -p origin main:main
-      - git -C vendor/psychedcms/psychedcms-core rebase main
-      - git -C vendor/psychedcms/psychedcms-core push --force-with-lease origin $(git -C vendor/psychedcms/psychedcms-core branch --show-current)
+      - git -C {{.PACKAGES_DIR}}/psychedcms-core fetch -p origin main:main
+      - git -C {{.PACKAGES_DIR}}/psychedcms-core rebase main
+      - git -C {{.PACKAGES_DIR}}/psychedcms-core push --force-with-lease origin $(git -C {{.PACKAGES_DIR}}/psychedcms-core branch --show-current)
 
   # Merge operations
   feature:merge:core:
@@ -193,20 +194,20 @@ tasks:
     vars:
       FEATURE: '{{.FEATURE}}'
     cmds:
-      - git -C vendor/psychedcms/psychedcms-core checkout main
-      - git -C vendor/psychedcms/psychedcms-core pull origin main
-      - git -C vendor/psychedcms/psychedcms-core merge --squash feature/{{.FEATURE}}
-      - 'git -C vendor/psychedcms/psychedcms-core commit -m "feat: {{.FEATURE}}"'
+      - git -C {{.PACKAGES_DIR}}/psychedcms-core checkout main
+      - git -C {{.PACKAGES_DIR}}/psychedcms-core pull origin main
+      - git -C {{.PACKAGES_DIR}}/psychedcms-core merge --squash feature/{{.FEATURE}}
+      - 'git -C {{.PACKAGES_DIR}}/psychedcms-core commit -m "feat: {{.FEATURE}}"'
 
   feature:push-merge:core:
     desc: Push merged main on psychedcms-core
     cmds:
-      - git -C vendor/psychedcms/psychedcms-core push origin main
+      - git -C {{.PACKAGES_DIR}}/psychedcms-core push origin main
 
   feature:cleanup:core:
     desc: "Delete feature branch on psychedcms-core (local and remote)"
     vars:
       FEATURE: '{{.FEATURE}}'
     cmds:
-      - git -C vendor/psychedcms/psychedcms-core branch -d feature/{{.FEATURE}} || true
-      - git -C vendor/psychedcms/psychedcms-core push origin --delete feature/{{.FEATURE}} || true
+      - git -C {{.PACKAGES_DIR}}/psychedcms-core branch -d feature/{{.FEATURE}} || true
+      - git -C {{.PACKAGES_DIR}}/psychedcms-core push origin --delete feature/{{.FEATURE}} || true

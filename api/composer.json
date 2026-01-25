@@ -5,8 +5,11 @@
     "prefer-stable": true,
     "repositories": [
         {
-            "type": "vcs",
-            "url": "https://github.com/psychedcms/psychedcms-core.git"
+            "type": "path",
+            "url": "../packages/psychedcms-core",
+            "options": {
+                "symlink": true
+            }
         }
     ],
     "require": {
@@ -82,5 +85,8 @@
         "installer-paths": {
             "vendor/psychedcms/{$name}": ["type:psychedcms"]
         }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^12.5.7"
     }
 }
