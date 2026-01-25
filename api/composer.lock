@@ -2349,7 +2349,7 @@
             "dist": {
                 "type": "path",
                 "url": "../packages/psychedcms-core",
-                "reference": "bd032dfc5d06ca155c79bf554d27b0a444fd2661"
+                "reference": "454e0478ee0f310759c37953b0ec36ca00a385af"
             },
             "require": {
                 "api-platform/core": "^4.0",
@@ -2359,6 +2359,7 @@
                 "php": ">=8.2",
                 "symfony/html-sanitizer": "^7.4",
                 "symfony/serializer": "^7.4",
+                "symfony/string": "^7.4",
                 "symfony/validator": "^7.4"
             },
             "require-dev": {
