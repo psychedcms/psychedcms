@@ -1,7 +1,38 @@
 api_platform:
-    title: Hello API Platform
+    title: PsychedCMS API
+    description: Content Management System API
     version: 1.0.0
+
     defaults:
         stateless: true
         cache_headers:
             vary: ['Content-Type', 'Authorization', 'Origin']
+        pagination_items_per_page: 30
+        pagination_maximum_items_per_page: 100
+        pagination_client_items_per_page: true
+
+    formats:
+        jsonld:
+            mime_types: ['application/ld+json']
+        json:
+            mime_types: ['application/json']
+        html:
+            mime_types: ['text/html']
+
+    docs_formats:
+        jsonld:
+            mime_types: ['application/ld+json']
+        jsonopenapi:
+            mime_types: ['application/vnd.openapi+json']
+        html:
+            mime_types: ['text/html']
+
+    enable_swagger_ui: true
+
+    graphql:
+        enabled: true
+        graphiql:
+            enabled: false
+
+    mercure:
+        enabled: true
