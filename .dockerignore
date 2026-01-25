@@ -1,0 +1,34 @@
+# Git
+.git
+.gitignore
+
+# Documentation
+*.md
+!README.md
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Agent OS
+agent-os/
+
+# API (Symfony)
+api/var/
+api/vendor/
+api/.env.local
+api/.env.*.local
+
+# Admin (React)
+admin/node_modules/
+admin/dist/
+admin/.env.local
+
+# Misc
+*.log

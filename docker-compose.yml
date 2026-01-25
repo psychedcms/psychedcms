@@ -1,0 +1,137 @@
+services:
+  # ===========================================================================
+  # PHP-FPM (Symfony API)
+  # ===========================================================================
+  php:
+    build:
+      context: .
+      dockerfile: .docker/php/Dockerfile
+      target: dev
+      args:
+        PHP_VERSION: ${PHP_VERSION}
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    volumes:
+      - ./api:/var/www/api:cached
+      - ./packages:/var/www/packages:cached
+    environment:
+      APP_ENV: ${APP_ENV}
+      APP_DEBUG: ${APP_DEBUG}
+      APP_SECRET: ${APP_SECRET}
+      DATABASE_URL: ${DATABASE_URL}
+      ELASTICSEARCH_URL: ${ELASTICSEARCH_URL}
+      CORS_ALLOW_ORIGIN: ${CORS_ALLOW_ORIGIN}
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - psyched
+
+  # ===========================================================================
+  # Nginx (Serves API + React Admin)
+  # ===========================================================================
+  nginx:
+    build:
+      context: .
+      dockerfile: .docker/nginx/Dockerfile
+    ports:
+      - "${NGINX_PORT}:80"
+    volumes:
+      - ./api/public:/var/www/api/public:ro
+      - ./admin/dist:/var/www/admin:ro
+    environment:
+      APP_DOMAIN: ${APP_DOMAIN}
+      NGINX_ENVSUBST_OUTPUT_DIR: /etc/nginx/conf.d
+    depends_on:
+      - php
+    networks:
+      - psyched
+
+  # ===========================================================================
+  # Node (React Admin development)
+  # ===========================================================================
+  node:
+    build:
+      context: .
+      dockerfile: .docker/node/Dockerfile
+      args:
+        NODE_VERSION: ${NODE_VERSION}
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    volumes:
+      - ./admin:/var/www/admin:cached
+    environment:
+      VITE_API_URL: ${VITE_API_URL}
+    ports:
+      - "5173:5173"
+    networks:
+      - psyched
+    profiles:
+      - dev
+
+  # ===========================================================================
+  # PostgreSQL
+  # ===========================================================================
+  database:
+    image: postgres:${POSTGRES_VERSION}-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - psyched
+
+  # ===========================================================================
+  # MinIO (S3-compatible object storage) - Optional
+  # ===========================================================================
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - minio_data:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    networks:
+      - psyched
+    profiles:
+      - storage
+
+  # ===========================================================================
+  # Elasticsearch - Optional
+  # ===========================================================================
+  elasticsearch:
+    image: elasticsearch:8.12.0
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    networks:
+      - psyched
+    profiles:
+      - search
+
+networks:
+  psyched:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  minio_data:
+  elasticsearch_data:

@@ -1,0 +1,113 @@
+version: '3'
+
+tasks:
+  # ===========================================================================
+  # Composer / Dependencies
+  # ===========================================================================
+  install:
+    desc: Install PHP dependencies
+    cmds:
+      - docker compose exec php composer install --prefer-source
+
+  update:
+    desc: Update PHP dependencies
+    cmds:
+      - docker compose exec php composer update --prefer-source
+
+  require:
+    desc: Add a new PHP dependency
+    cmds:
+      - docker compose exec php composer require {{.CLI_ARGS}}
+
+  # ===========================================================================
+  # Database
+  # ===========================================================================
+  migrate:
+    desc: Run database migrations
+    cmds:
+      - docker compose exec php bin/console doctrine:migrations:migrate --no-interaction
+
+  migrate:diff:
+    desc: Generate a migration diff
+    cmds:
+      - docker compose exec php bin/console doctrine:migrations:diff
+
+  migrate:status:
+    desc: Show migration status
+    cmds:
+      - docker compose exec php bin/console doctrine:migrations:status
+
+  db:create:
+    desc: Create the database
+    cmds:
+      - docker compose exec php bin/console doctrine:database:create --if-not-exists
+
+  db:drop:
+    desc: Drop the database
+    cmds:
+      - docker compose exec php bin/console doctrine:database:drop --force --if-exists
+
+  db:reset:
+    desc: Reset the database (drop, create, migrate)
+    cmds:
+      - task: db:drop
+      - task: db:create
+      - task: migrate
+
+  # ===========================================================================
+  # Symfony Console
+  # ===========================================================================
+  console:
+    desc: Run Symfony console command
+    cmds:
+      - docker compose exec php bin/console {{.CLI_ARGS}}
+
+  cache:clear:
+    desc: Clear Symfony cache
+    cmds:
+      - docker compose exec php bin/console cache:clear
+
+  # ===========================================================================
+  # Testing
+  # ===========================================================================
+  test:
+    desc: Run PHPUnit tests
+    cmds:
+      - docker compose exec php bin/phpunit {{.CLI_ARGS}}
+
+  test:coverage:
+    desc: Run tests with coverage report
+    cmds:
+      - docker compose exec php bin/phpunit --coverage-html var/coverage
+
+  # ===========================================================================
+  # Code Quality
+  # ===========================================================================
+  lint:
+    desc: Run all linting tools
+    cmds:
+      - task: phpstan
+      - task: cs:check
+
+  phpstan:
+    desc: Run PHPStan static analysis
+    cmds:
+      - docker compose exec php vendor/bin/phpstan analyse
+
+  cs:check:
+    desc: Check code style with PHP-CS-Fixer
+    cmds:
+      - docker compose exec php vendor/bin/php-cs-fixer fix --dry-run --diff
+
+  cs:fix:
+    desc: Fix code style with PHP-CS-Fixer
+    cmds:
+      - docker compose exec php vendor/bin/php-cs-fixer fix
+
+  # ===========================================================================
+  # API Platform
+  # ===========================================================================
+  api:routes:
+    desc: List all API routes
+    cmds:
+      - docker compose exec php bin/console debug:router --show-controllers | grep api
