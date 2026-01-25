@@ -5,8 +5,8 @@
     "prefer-stable": true,
     "repositories": [
         {
-            "type": "path",
-            "url": "../packages/psyched-cms-core"
+            "type": "vcs",
+            "url": "https://github.com/psychedcms/psychedcms-core.git"
         }
     ],
     "require": {
@@ -14,12 +14,13 @@
         "ext-ctype": "*",
         "ext-iconv": "*",
         "api-platform/core": "^4.2.14",
+        "composer/installers": "^2.0",
         "doctrine/doctrine-bundle": "^2.18.2",
         "doctrine/doctrine-migrations-bundle": "^3.7",
         "doctrine/orm": "^3.6.1",
         "gedmo/doctrine-extensions": "^3.22",
         "nelmio/cors-bundle": "^2.6.1",
-        "psyched/psyched-cms-core": "@dev",
+        "psychedcms/psychedcms-core": "@dev",
         "symfony/console": "7.4.*",
         "symfony/dotenv": "7.4.*",
         "symfony/flex": "^2.10",
@@ -76,6 +77,9 @@
         "symfony": {
             "allow-contrib": false,
             "require": "7.4.*"
+        },
+        "installer-paths": {
+            "vendor/psychedcms/{$name}": ["type:psychedcms"]
         }
     }
 }

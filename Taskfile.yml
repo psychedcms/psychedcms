@@ -93,8 +93,8 @@ tasks:
     cmds:
       - docker compose exec database psql -U $POSTGRES_USER -d $POSTGRES_DB
     env:
-      POSTGRES_USER: '{{.POSTGRES_USER | default "psyched"}}'
-      POSTGRES_DB: '{{.POSTGRES_DB | default "psyched"}}'
+      POSTGRES_USER: '{{.POSTGRES_USER | default "psychedcms"}}'
+      POSTGRES_DB: '{{.POSTGRES_DB | default "psychedcms"}}'
 
   # ===========================================================================
   # Quick Setup
@@ -161,3 +161,114 @@ tasks:
     cmds:
       - docker compose down -v --rmi local
       - docker builder prune -f
+
+  # ===========================================================================
+  # Testing
+  # ===========================================================================
+  test:all:
+    desc: Run all tests (api + admin + packages)
+    cmds:
+      - task: api:test
+      - task: admin:test
+
+  # ===========================================================================
+  # Git - Main Project (atomic operations)
+  # ===========================================================================
+  git:status:
+    desc: Show git status for main project
+    cmds:
+      - echo "=== Main Project ===" && git status -s && git log -1 --oneline
+
+  git:status:all:
+    desc: Show git status for main project and all packages
+    cmds:
+      - task: git:status
+      - task: api:git:status:core
+
+  git:branch:
+    desc: Show current branch for main project
+    cmds:
+      - git branch --show-current
+
+
+  # ===========================================================================
+  # Feature Branch - Main Project (atomic operations)
+  # ===========================================================================
+  feature:ensure:
+    desc: "Ensure feature branch exists on main project, create if needed"
+    vars:
+      FEATURE: '{{.FEATURE}}'
+    cmds:
+      - scripts/git-ensure-branch.sh . feature/{{.FEATURE}}
+
+  feature:checkout:
+    desc: "Checkout feature branch on main project"
+    vars:
+      FEATURE: '{{.FEATURE}}'
+    cmds:
+      - git checkout feature/{{.FEATURE}}
+
+  # ===========================================================================
+  # Commit - Main Project (with lazy branch creation)
+  # ===========================================================================
+  commit:
+    desc: "Commit main project with feature reference (creates branch if needed)"
+    vars:
+      FEATURE: '{{.FEATURE}}'
+      MESSAGE: '{{.MESSAGE}}'
+    cmds:
+      - task: feature:ensure
+        vars:
+          FEATURE: '{{.FEATURE}}'
+      - git add .
+      - git commit -m "[feature/{{.FEATURE}}] {{.MESSAGE}}"
+
+  # ===========================================================================
+  # Push/Pull - Main Project
+  # ===========================================================================
+  push:
+    desc: Push main project current branch
+    cmds:
+      - git push -u origin $(git branch --show-current)
+
+  pull:
+    desc: "Pull main project (current branch or specified: task pull BRANCH=x)"
+    vars:
+      BRANCH:
+        sh: echo "${BRANCH:-$(git branch --show-current)}"
+    cmds:
+      - git checkout {{.BRANCH}}
+      - git pull origin {{.BRANCH}}
+
+  rebase:
+    desc: "Rebase current feature branch onto main (updates main, rebases, force pushes)"
+    cmds:
+      - git fetch -p origin main:main
+      - git rebase main
+      - git push --force-with-lease origin $(git branch --show-current)
+
+  # ===========================================================================
+  # Merge - Main Project
+  # ===========================================================================
+  feature:merge:
+    desc: "Squash merge feature to main on main project"
+    vars:
+      FEATURE: '{{.FEATURE}}'
+    cmds:
+      - git checkout main
+      - git pull origin main
+      - git merge --squash feature/{{.FEATURE}}
+      - git commit -m "feat: {{.FEATURE}}"
+
+  feature:push-merge:
+    desc: Push merged main on main project
+    cmds:
+      - git push origin main
+
+  feature:cleanup:
+    desc: "Delete feature branch on main project (local and remote)"
+    vars:
+      FEATURE: '{{.FEATURE}}'
+    cmds:
+      - git branch -d feature/{{.FEATURE}} || true
+      - git push origin --delete feature/{{.FEATURE}} || true
