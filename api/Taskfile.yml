@@ -1,5 +1,8 @@
 version: '3'
 
+vars:
+  COMPOSE_FILE: '{{.ROOT_DIR}}/docker-compose.yml'
+
 tasks:
   # ===========================================================================
   # Composer / Dependencies
@@ -7,17 +10,17 @@ tasks:
   install:
     desc: Install PHP dependencies
     cmds:
-      - docker compose exec php composer install --prefer-source
+      - docker compose -f {{.COMPOSE_FILE}} exec php composer install --prefer-source
 
   update:
     desc: Update PHP dependencies
     cmds:
-      - docker compose exec php composer update --prefer-source
+      - docker compose -f {{.COMPOSE_FILE}} exec php composer update --prefer-source
 
   require:
     desc: Add a new PHP dependency
     cmds:
-      - docker compose exec php composer require {{.CLI_ARGS}}
+      - docker compose -f {{.COMPOSE_FILE}} exec php composer require {{.CLI_ARGS}}
 
   # ===========================================================================
   # Database
@@ -25,27 +28,27 @@ tasks:
   migrate:
     desc: Run database migrations
     cmds:
-      - docker compose exec php bin/console doctrine:migrations:migrate --no-interaction
+      - docker compose -f {{.COMPOSE_FILE}} exec php bin/console doctrine:migrations:migrate --no-interaction
 
   migrate:diff:
     desc: Generate a migration diff
     cmds:
-      - docker compose exec php bin/console doctrine:migrations:diff
+      - docker compose -f {{.COMPOSE_FILE}} exec php bin/console doctrine:migrations:diff
 
   migrate:status:
     desc: Show migration status
     cmds:
-      - docker compose exec php bin/console doctrine:migrations:status
+      - docker compose -f {{.COMPOSE_FILE}} exec php bin/console doctrine:migrations:status
 
   db:create:
     desc: Create the database
     cmds:
-      - docker compose exec php bin/console doctrine:database:create --if-not-exists
+      - docker compose -f {{.COMPOSE_FILE}} exec php bin/console doctrine:database:create --if-not-exists
 
   db:drop:
     desc: Drop the database
     cmds:
-      - docker compose exec php bin/console doctrine:database:drop --force --if-exists
+      - docker compose -f {{.COMPOSE_FILE}} exec php bin/console doctrine:database:drop --force --if-exists
 
   db:reset:
     desc: Reset the database (drop, create, migrate)
@@ -60,12 +63,12 @@ tasks:
   console:
     desc: Run Symfony console command
     cmds:
-      - docker compose exec php bin/console {{.CLI_ARGS}}
+      - docker compose -f {{.COMPOSE_FILE}} exec php bin/console {{.CLI_ARGS}}
 
   cache:clear:
     desc: Clear Symfony cache
     cmds:
-      - docker compose exec php bin/console cache:clear
+      - docker compose -f {{.COMPOSE_FILE}} exec php bin/console cache:clear
 
   # ===========================================================================
   # Testing
@@ -73,12 +76,12 @@ tasks:
   test:
     desc: Run PHPUnit tests
     cmds:
-      - docker compose exec php bin/phpunit {{.CLI_ARGS}}
+      - docker compose -f {{.COMPOSE_FILE}} exec php bin/phpunit {{.CLI_ARGS}}
 
   test:coverage:
     desc: Run tests with coverage report
     cmds:
-      - docker compose exec php bin/phpunit --coverage-html var/coverage
+      - docker compose -f {{.COMPOSE_FILE}} exec php bin/phpunit --coverage-html var/coverage
 
   # ===========================================================================
   # Code Quality
@@ -92,17 +95,17 @@ tasks:
   phpstan:
     desc: Run PHPStan static analysis
     cmds:
-      - docker compose exec php vendor/bin/phpstan analyse
+      - docker compose -f {{.COMPOSE_FILE}} exec php vendor/bin/phpstan analyse
 
   cs:check:
     desc: Check code style with PHP-CS-Fixer
     cmds:
-      - docker compose exec php vendor/bin/php-cs-fixer fix --dry-run --diff
+      - docker compose -f {{.COMPOSE_FILE}} exec php vendor/bin/php-cs-fixer fix --dry-run --diff
 
   cs:fix:
     desc: Fix code style with PHP-CS-Fixer
     cmds:
-      - docker compose exec php vendor/bin/php-cs-fixer fix
+      - docker compose -f {{.COMPOSE_FILE}} exec php vendor/bin/php-cs-fixer fix
 
   # ===========================================================================
   # API Platform
@@ -110,7 +113,7 @@ tasks:
   api:routes:
     desc: List all API routes
     cmds:
-      - docker compose exec php bin/console debug:router --show-controllers | grep api
+      - docker compose -f {{.COMPOSE_FILE}} exec php bin/console debug:router --show-controllers | grep api
 
   # ===========================================================================
   # Package Testing - psychedcms-core
@@ -118,7 +121,7 @@ tasks:
   test:core:
     desc: Run tests for psychedcms-core package
     cmds:
-      - docker compose exec php bin/phpunit vendor/psychedcms/psychedcms-core/tests/
+      - docker compose -f {{.COMPOSE_FILE}} exec php bin/phpunit vendor/psychedcms/psychedcms-core/tests/
 
   # ===========================================================================
   # Git - psychedcms-core (atomic operations)
@@ -159,8 +162,8 @@ tasks:
       - task: feature:ensure:core
         vars:
           FEATURE: '{{.FEATURE}}'
-      - git -C vendor/psychedcms/psychedcms-core add .
-      - git -C vendor/psychedcms/psychedcms-core commit -m "[feature/{{.FEATURE}}] core: {{.MESSAGE}}"
+      - cmd: 'git -C vendor/psychedcms/psychedcms-core add .'
+      - cmd: 'git -C vendor/psychedcms/psychedcms-core commit -m "[feature/{{.FEATURE}}] core: {{.MESSAGE}}"'
 
   # Push/Pull operations
   push:core:
@@ -169,7 +172,7 @@ tasks:
       - git -C vendor/psychedcms/psychedcms-core push -u origin $(git -C vendor/psychedcms/psychedcms-core branch --show-current)
 
   pull:core:
-    desc: "Pull psychedcms-core (current branch or specified: task api:pull:core BRANCH=x)"
+    desc: 'Pull psychedcms-core (current branch or specified via BRANCH=x)'
     vars:
       BRANCH:
         sh: echo "${BRANCH:-$(git -C vendor/psychedcms/psychedcms-core branch --show-current)}"
@@ -193,7 +196,7 @@ tasks:
       - git -C vendor/psychedcms/psychedcms-core checkout main
       - git -C vendor/psychedcms/psychedcms-core pull origin main
       - git -C vendor/psychedcms/psychedcms-core merge --squash feature/{{.FEATURE}}
-      - git -C vendor/psychedcms/psychedcms-core commit -m "feat: {{.FEATURE}}"
+      - 'git -C vendor/psychedcms/psychedcms-core commit -m "feat: {{.FEATURE}}"'
 
   feature:push-merge:core:
     desc: Push merged main on psychedcms-core

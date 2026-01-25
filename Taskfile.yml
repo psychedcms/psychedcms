@@ -258,7 +258,7 @@ tasks:
       - git checkout main
       - git pull origin main
       - git merge --squash feature/{{.FEATURE}}
-      - git commit -m "feat: {{.FEATURE}}"
+      - cmd: 'git commit -m "feat: {{.FEATURE}}"'
 
   feature:push-merge:
     desc: Push merged main on main project
