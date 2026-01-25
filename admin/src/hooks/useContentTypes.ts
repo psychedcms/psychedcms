@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { usePsychedSchemaContext } from '../providers/PsychedSchemaProvider.tsx';
+import { usePsychedSchemaContext } from '../providers/PsychedSchemaContext.ts';
 import type { ResourceSchema } from '../types/psychedcms.ts';
 
 /**

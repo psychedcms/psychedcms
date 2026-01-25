@@ -1,4 +1,4 @@
-import { usePsychedSchemaContext } from '../providers/PsychedSchemaProvider.tsx';
+import { usePsychedSchemaContext } from '../providers/PsychedSchemaContext.ts';
 import type { FieldMetadata } from '../types/psychedcms.ts';
 
 /**

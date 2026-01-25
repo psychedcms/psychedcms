@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import type { ReactNode } from 'react';
 
-import { PsychedSchemaContext } from '../providers/PsychedSchemaProvider.tsx';
+import { PsychedSchemaContext } from '../providers/PsychedSchemaContext.ts';
 import type { PsychedSchema, ResourceSchema } from '../types/psychedcms.ts';
 import { MenuIcon } from '../components/layout/MenuIcon.tsx';
 import { PsychedMenu } from '../components/layout/PsychedMenu.tsx';

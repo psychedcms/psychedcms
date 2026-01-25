@@ -2,7 +2,7 @@ import { renderHook } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import type { ReactNode } from 'react';
 
-import { PsychedSchemaContext } from '../providers/PsychedSchemaProvider.tsx';
+import { PsychedSchemaContext } from '../providers/PsychedSchemaContext.ts';
 import type { PsychedSchema } from '../types/psychedcms.ts';
 import { usePsychedSchema } from '../hooks/usePsychedSchema.ts';
 import { useFieldMetadata } from '../hooks/useFieldMetadata.ts';

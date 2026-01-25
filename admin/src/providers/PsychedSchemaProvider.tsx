@@ -1,25 +1,8 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  type ReactNode,
-} from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 
 import type { OpenApiDocument, PsychedSchema } from '../types/psychedcms.ts';
 import { parseOpenApiExtensions } from '../utils/parseOpenApiExtensions.ts';
-
-interface PsychedSchemaContextValue {
-  schema: PsychedSchema | null;
-  loading: boolean;
-  error: Error | null;
-}
-
-const PsychedSchemaContext = createContext<PsychedSchemaContextValue>({
-  schema: null,
-  loading: true,
-  error: null,
-});
+import { PsychedSchemaContext } from './PsychedSchemaContext.ts';
 
 interface PsychedSchemaProviderProps {
   entrypoint: string;
@@ -90,13 +73,3 @@ export function PsychedSchemaProvider({
     </PsychedSchemaContext.Provider>
   );
 }
-
-/**
- * Hook to access the raw schema context value.
- * Most components should use the higher-level hooks instead.
- */
-export function usePsychedSchemaContext(): PsychedSchemaContextValue {
-  return useContext(PsychedSchemaContext);
-}
-
-export { PsychedSchemaContext };
