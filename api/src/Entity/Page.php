@@ -11,8 +11,9 @@ use PsychedCms\Core\Attribute\ContentType;
 use PsychedCms\Core\Attribute\Field\HtmlField;
 use PsychedCms\Core\Attribute\Field\TextField;
 use PsychedCms\Core\Attribute\Field\TextareaField;
-use PsychedCms\Core\Content\ContentInterface;
 use PsychedCms\Core\Content\ContentTrait;
+use PsychedCms\Workflow\Content\PublicationWorkflowAwareInterface;
+use PsychedCms\Workflow\Content\PublicationWorkflowTrait;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PageRepository::class)]
@@ -21,9 +22,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Index(columns: ['author_id'], name: 'idx_pages_author_id')]
 #[ApiResource(mercure: true)]
 #[ContentType(icon: 'Description')]
-class Page implements ContentInterface
+class Page implements PublicationWorkflowAwareInterface
 {
     use ContentTrait;
+    use PublicationWorkflowTrait;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]

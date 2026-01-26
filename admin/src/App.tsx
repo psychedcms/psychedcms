@@ -4,7 +4,7 @@ import type { Resource } from '@api-platform/api-doc-parser';
 
 import { PsychedSchemaProvider } from './providers/PsychedSchemaProvider.tsx';
 import { PsychedLayout } from './components/layout/index.ts';
-import { PsychedCreateGuesser, PsychedEditGuesser } from './components/forms/index.ts';
+import { PsychedCreateGuesser, PsychedEditGuesser, PsychedListGuesser } from './components/forms/index.ts';
 
 const entrypoint = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
@@ -47,6 +47,7 @@ function PsychedAdmin() {
           <ResourceGuesser
             key={resource.name}
             name={resource.name}
+            list={PsychedListGuesser}
             create={PsychedCreateGuesser}
             edit={PsychedEditGuesser}
           />

@@ -184,6 +184,7 @@ tasks:
     cmds:
       - task: git:status
       - task: api:git:status:core
+      - task: api:git:status:workflow
 
   git:branch:
     desc: Show current branch for main project

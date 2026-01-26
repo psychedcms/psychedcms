@@ -6,12 +6,14 @@ export interface PsychedSchemaContextValue {
   schema: PsychedSchema | null;
   loading: boolean;
   error: Error | null;
+  entrypoint: string;
 }
 
 export const PsychedSchemaContext = createContext<PsychedSchemaContextValue>({
   schema: null,
   loading: true,
   error: null,
+  entrypoint: '',
 });
 
 /**

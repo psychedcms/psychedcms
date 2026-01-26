@@ -42,7 +42,8 @@ export function MarkdownInput({ source, label, helperText, ...props }: MarkdownI
     ],
     content: value || '',
     onUpdate: ({ editor }) => {
-      const markdown = editor.storage.markdown.getMarkdown();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const markdown = (editor.storage as any).markdown?.getMarkdown() ?? '';
       onChange(markdown);
     },
   });

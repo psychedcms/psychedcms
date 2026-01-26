@@ -1,5 +1,10 @@
 export { TabbedFormGuesser } from './TabbedFormGuesser.tsx';
+export { ContentForm } from './ContentForm.tsx';
+export { TwoColumnLayout } from './TwoColumnLayout.tsx';
+export { EditSidebar } from './EditSidebar.tsx';
 export { FieldGroup } from './FieldGroup.tsx';
 export { PsychedCreateGuesser } from './PsychedCreateGuesser.tsx';
 export { PsychedEditGuesser } from './PsychedEditGuesser.tsx';
+export { PsychedListGuesser } from './PsychedListGuesser.tsx';
 export { PsychedResourceGuesser } from './PsychedResourceGuesser.tsx';
+export { WorkflowButton } from './WorkflowButton.tsx';

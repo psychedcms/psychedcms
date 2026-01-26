@@ -2,14 +2,13 @@ import {
   useResourceContext,
   SimpleForm,
   TabbedForm,
-  type SimpleFormProps,
 } from 'react-admin';
 
 import { usePsychedSchema } from '../../hooks/usePsychedSchema.ts';
 import { PsychedInputGuesser } from '../inputs/PsychedInputGuesser.tsx';
 import { FieldGroup } from './FieldGroup.tsx';
 
-interface TabbedFormGuesserProps extends Omit<SimpleFormProps, 'children'> {
+interface TabbedFormGuesserProps {
   resource?: string;
 }
 
@@ -50,20 +49,14 @@ function humanizeGroupName(group: string): string {
  */
 export function TabbedFormGuesser({
   resource: resourceProp,
-  ...props
 }: TabbedFormGuesserProps) {
   const resourceFromContext = useResourceContext();
   const resource = resourceProp ?? resourceFromContext ?? '';
 
   const resourceSchema = usePsychedSchema(resource);
 
-  // Debug logging
-  console.log('[TabbedFormGuesser] resource:', resource);
-  console.log('[TabbedFormGuesser] resourceSchema:', resourceSchema);
-
   if (!resourceSchema || resourceSchema.fields.size === 0) {
-    console.log('[TabbedFormGuesser] No schema found, falling back to SimpleForm');
-    return <SimpleForm {...props} />;
+    return <SimpleForm>{null}</SimpleForm>;
   }
 
   const groupedFields = groupFieldsByGroup(resourceSchema.fields);
@@ -73,7 +66,7 @@ export function TabbedFormGuesser({
     const fields = groupOrder.length === 1 ? groupedFields.get(groupOrder[0]) ?? [] : [];
 
     return (
-      <SimpleForm {...props}>
+      <SimpleForm>
         {fields.map((fieldName) => (
           <PsychedInputGuesser key={fieldName} source={fieldName} resource={resource} />
         ))}
@@ -82,7 +75,7 @@ export function TabbedFormGuesser({
   }
 
   return (
-    <TabbedForm {...props}>
+    <TabbedForm>
       {groupOrder.map((group) => {
         const fields = groupedFields.get(group) ?? [];
         const label = humanizeGroupName(group);

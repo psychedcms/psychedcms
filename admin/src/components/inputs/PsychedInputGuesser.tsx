@@ -34,8 +34,11 @@ interface PsychedInputGuesserProps extends Omit<InputProps, 'source'> {
 export function PsychedInputGuesser({
   source,
   resource: resourceProp,
+  // Filter out MUI theme props that shouldn't reach DOM elements
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  styleOverrides: _styleOverrides,
   ...props
-}: PsychedInputGuesserProps) {
+}: PsychedInputGuesserProps & { styleOverrides?: unknown }) {
   const resourceFromContext = useResourceContext();
   const resource = resourceProp ?? resourceFromContext ?? '';
 

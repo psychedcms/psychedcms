@@ -1,0 +1,239 @@
+import { useState, useEffect, useCallback } from 'react';
+import { useNotify } from 'react-admin';
+import { usePsychedSchemaContext } from '../providers/PsychedSchemaContext.ts';
+import type { WorkflowState, TransitionMeta } from '../types/psychedcms.ts';
+
+/**
+ * Transition metadata for display and ordering.
+ * Priority determines which transition is shown as the primary action.
+ */
+const TRANSITION_META: Record<string, TransitionMeta & { priority: number }> = {
+  publish: {
+    name: 'publish',
+    label: 'Publish',
+    color: 'success',
+    priority: 10,
+  },
+  approve: {
+    name: 'approve',
+    label: 'Approve',
+    color: 'success',
+    priority: 9,
+  },
+  submit_for_review: {
+    name: 'submit_for_review',
+    label: 'Submit for Review',
+    color: 'primary',
+    priority: 7,
+  },
+  schedule: {
+    name: 'schedule',
+    label: 'Schedule',
+    color: 'warning',
+    priority: 6,
+  },
+  request_changes: {
+    name: 'request_changes',
+    label: 'Request Changes',
+    color: 'warning',
+    priority: 5,
+  },
+  unpublish: {
+    name: 'unpublish',
+    label: 'Unpublish',
+    color: 'secondary',
+    priority: 4,
+  },
+  archive: {
+    name: 'archive',
+    label: 'Archive',
+    color: 'error',
+    priority: 3,
+  },
+  restore: {
+    name: 'restore',
+    label: 'Restore',
+    color: 'info',
+    priority: 8,
+  },
+  auto_publish: {
+    name: 'auto_publish',
+    label: 'Auto Publish',
+    color: 'success',
+    priority: 1,
+  },
+};
+
+/**
+ * Convert transition name to API endpoint format (kebab-case).
+ */
+export function transitionToEndpoint(transition: string): string {
+  return transition.replace(/_/g, '-');
+}
+
+/**
+ * Extract the resource name from a potentially full path.
+ * e.g., "/api/posts" -> "posts", "posts" -> "posts"
+ */
+function normalizeResourceName(resource: string): string {
+  return resource.replace(/^\/api\//, '');
+}
+
+/**
+ * Extract the numeric ID from a Hydra IRI or return as-is if already numeric.
+ * e.g., "/api/posts/2" -> "2", 2 -> "2"
+ */
+function normalizeRecordId(recordId: string | number): string {
+  const idString = String(recordId);
+  // Extract the last segment after the final slash
+  const match = idString.match(/\/([^/]+)$/);
+  return match ? match[1] : idString;
+}
+
+/**
+ * Get transition metadata with display information.
+ */
+export function getTransitionMeta(transition: string): TransitionMeta {
+  return (
+    TRANSITION_META[transition] ?? {
+      name: transition,
+      label: transition.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
+      color: 'primary',
+    }
+  );
+}
+
+/**
+ * Sort transitions by priority (highest first).
+ */
+function sortTransitionsByPriority(transitions: string[]): string[] {
+  return [...transitions].sort((a, b) => {
+    const priorityA = TRANSITION_META[a]?.priority ?? 0;
+    const priorityB = TRANSITION_META[b]?.priority ?? 0;
+    return priorityB - priorityA;
+  });
+}
+
+interface UseWorkflowStateResult {
+  loading: boolean;
+  error: Error | null;
+  workflowState: WorkflowState | null;
+  primaryTransition: string | null;
+  secondaryTransitions: string[];
+  applyTransition: (transition: string) => Promise<void>;
+  refresh: () => void;
+}
+
+/**
+ * Hook to fetch and manage workflow state for a record.
+ */
+export function useWorkflowState(
+  resource: string | undefined,
+  recordId: string | number | undefined
+): UseWorkflowStateResult {
+  const { entrypoint } = usePsychedSchemaContext();
+  const notify = useNotify();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const [workflowState, setWorkflowState] = useState<WorkflowState | null>(null);
+
+  const fetchWorkflowState = useCallback(async () => {
+    if (!resource || recordId === undefined || recordId === null || !entrypoint) {
+      setWorkflowState(null);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const resourceName = normalizeResourceName(resource);
+      const normalizedId = normalizeRecordId(recordId);
+      const url = `${entrypoint}/${resourceName}/${normalizedId}/workflow-state`;
+      const response = await fetch(url, {
+        headers: {
+          Accept: 'application/ld+json',
+        },
+      });
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          // Workflow not enabled for this resource
+          setWorkflowState(null);
+          return;
+        }
+        throw new Error(`Failed to fetch workflow state: ${response.status}`);
+      }
+
+      const data: WorkflowState = await response.json();
+      setWorkflowState(data);
+    } catch (err) {
+      setError(err as Error);
+      setWorkflowState(null);
+    } finally {
+      setLoading(false);
+    }
+  }, [entrypoint, resource, recordId]);
+
+  useEffect(() => {
+    fetchWorkflowState();
+  }, [fetchWorkflowState]);
+
+  const applyTransition = useCallback(
+    async (transition: string) => {
+      if (!resource || !recordId || !entrypoint) {
+        throw new Error('Resource, record ID, or entrypoint not available');
+      }
+
+      const endpoint = transitionToEndpoint(transition);
+      const resourceName = normalizeResourceName(resource);
+      const normalizedId = normalizeRecordId(recordId);
+
+      try {
+        const response = await fetch(`${entrypoint}/${resourceName}/${normalizedId}/${endpoint}`, {
+          method: 'POST',
+          headers: {
+            Accept: 'application/ld+json',
+            'Content-Type': 'application/ld+json',
+          },
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          const message = errorData['hydra:description'] || errorData.detail || `HTTP ${response.status}`;
+          throw new Error(message);
+        }
+
+        notify(`${getTransitionMeta(transition).label} applied successfully`, {
+          type: 'success',
+        });
+
+        // Refresh workflow state after transition
+        await fetchWorkflowState();
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Unknown error';
+        notify(`Failed to apply transition: ${message}`, { type: 'error' });
+        throw err;
+      }
+    },
+    [entrypoint, resource, recordId, notify, fetchWorkflowState]
+  );
+
+  // Sort transitions by priority and split into primary/secondary
+  const sortedTransitions = workflowState
+    ? sortTransitionsByPriority(workflowState.available_transitions)
+    : [];
+
+  const primaryTransition = sortedTransitions[0] ?? null;
+  const secondaryTransitions = sortedTransitions.slice(1);
+
+  return {
+    loading,
+    error,
+    workflowState,
+    primaryTransition,
+    secondaryTransitions,
+    applyTransition,
+    refresh: fetchWorkflowState,
+  };
+}

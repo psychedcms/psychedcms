@@ -211,3 +211,98 @@ tasks:
     cmds:
       - git -C {{.PACKAGES_DIR}}/psychedcms-core branch -d feature/{{.FEATURE}} || true
       - git -C {{.PACKAGES_DIR}}/psychedcms-core push origin --delete feature/{{.FEATURE}} || true
+
+  # ===========================================================================
+  # Package Testing - psychedcms-workflow
+  # ===========================================================================
+  test:workflow:
+    desc: Run tests for psychedcms-workflow package
+    cmds:
+      - docker compose -f {{.COMPOSE_FILE}} exec php bin/phpunit {{.PACKAGES_DIR}}/psychedcms-workflow/tests/
+
+  # ===========================================================================
+  # Git - psychedcms-workflow (atomic operations)
+  # ===========================================================================
+  git:status:workflow:
+    desc: Show git status for psychedcms-workflow
+    cmds:
+      - echo "=== psychedcms-workflow ===" && git -C {{.PACKAGES_DIR}}/psychedcms-workflow status -s && git -C {{.PACKAGES_DIR}}/psychedcms-workflow log -1 --oneline
+
+  git:branch:workflow:
+    desc: Show current branch for psychedcms-workflow
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-workflow branch --show-current
+
+  # Feature branch operations
+  feature:ensure:workflow:
+    desc: "Ensure feature branch exists on psychedcms-workflow, create if needed"
+    vars:
+      FEATURE: '{{.FEATURE}}'
+    cmds:
+      - ../scripts/git-ensure-branch.sh {{.PACKAGES_DIR}}/psychedcms-workflow feature/{{.FEATURE}}
+
+  feature:checkout:workflow:
+    desc: "Checkout feature branch on psychedcms-workflow"
+    vars:
+      FEATURE: '{{.FEATURE}}'
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-workflow checkout feature/{{.FEATURE}}
+
+  # Commit operations (with lazy branch creation)
+  commit:workflow:
+    desc: "Commit psychedcms-workflow with feature reference (creates branch if needed)"
+    vars:
+      FEATURE: '{{.FEATURE}}'
+      MESSAGE: '{{.MESSAGE}}'
+    cmds:
+      - task: feature:ensure:workflow
+        vars:
+          FEATURE: '{{.FEATURE}}'
+      - cmd: 'git -C {{.PACKAGES_DIR}}/psychedcms-workflow add .'
+      - cmd: 'git -C {{.PACKAGES_DIR}}/psychedcms-workflow commit -m "[feature/{{.FEATURE}}] workflow: {{.MESSAGE}}"'
+
+  # Push/Pull operations
+  push:workflow:
+    desc: Push psychedcms-workflow current branch
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-workflow push -u origin $(git -C {{.PACKAGES_DIR}}/psychedcms-workflow branch --show-current)
+
+  pull:workflow:
+    desc: 'Pull psychedcms-workflow (current branch or specified via BRANCH=x)'
+    vars:
+      BRANCH:
+        sh: echo "${BRANCH:-$(git -C {{.PACKAGES_DIR}}/psychedcms-workflow branch --show-current)}"
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-workflow checkout {{.BRANCH}}
+      - git -C {{.PACKAGES_DIR}}/psychedcms-workflow pull origin {{.BRANCH}}
+
+  rebase:workflow:
+    desc: "Rebase current feature branch onto main on psychedcms-workflow (updates main, rebases, force pushes)"
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-workflow fetch -p origin main:main
+      - git -C {{.PACKAGES_DIR}}/psychedcms-workflow rebase main
+      - git -C {{.PACKAGES_DIR}}/psychedcms-workflow push --force-with-lease origin $(git -C {{.PACKAGES_DIR}}/psychedcms-workflow branch --show-current)
+
+  # Merge operations
+  feature:merge:workflow:
+    desc: "Squash merge feature to main on psychedcms-workflow"
+    vars:
+      FEATURE: '{{.FEATURE}}'
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-workflow checkout main
+      - git -C {{.PACKAGES_DIR}}/psychedcms-workflow pull origin main
+      - git -C {{.PACKAGES_DIR}}/psychedcms-workflow merge --squash feature/{{.FEATURE}}
+      - 'git -C {{.PACKAGES_DIR}}/psychedcms-workflow commit -m "feat: {{.FEATURE}}"'
+
+  feature:push-merge:workflow:
+    desc: Push merged main on psychedcms-workflow
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-workflow push origin main
+
+  feature:cleanup:workflow:
+    desc: "Delete feature branch on psychedcms-workflow (local and remote)"
+    vars:
+      FEATURE: '{{.FEATURE}}'
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-workflow branch -d feature/{{.FEATURE}} || true
+      - git -C {{.PACKAGES_DIR}}/psychedcms-workflow push origin --delete feature/{{.FEATURE}} || true

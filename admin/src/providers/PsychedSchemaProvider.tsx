@@ -69,7 +69,7 @@ export function PsychedSchemaProvider({
   }, [entrypoint]);
 
   return (
-    <PsychedSchemaContext.Provider value={{ schema, loading, error }}>
+    <PsychedSchemaContext.Provider value={{ schema, loading, error, entrypoint }}>
       {children}
     </PsychedSchemaContext.Provider>
   );

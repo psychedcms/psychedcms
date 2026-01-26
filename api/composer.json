@@ -10,6 +10,13 @@
             "options": {
                 "symlink": true
             }
+        },
+        {
+            "type": "path",
+            "url": "../packages/psychedcms-workflow",
+            "options": {
+                "symlink": true
+            }
         }
     ],
     "require": {
@@ -24,6 +31,8 @@
         "gedmo/doctrine-extensions": "^3.22",
         "nelmio/cors-bundle": "^2.6.1",
         "psychedcms/psychedcms-core": "@dev",
+        "psychedcms/psychedcms-workflow": "@dev",
+        "symfony/workflow": "7.4.*",
         "stof/doctrine-extensions-bundle": "^1.15.3",
         "symfony/console": "7.4.*",
         "symfony/dotenv": "7.4.*",

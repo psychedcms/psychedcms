@@ -24,10 +24,9 @@ api_platform:
             mime_types: ['application/ld+json']
         jsonopenapi:
             mime_types: ['application/vnd.openapi+json']
-        html:
-            mime_types: ['text/html']
 
-    enable_swagger_ui: true
+    # Swagger UI disabled - requires symfony/twig-bundle
+    enable_swagger_ui: false
 
     graphql:
         enabled: true

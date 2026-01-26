@@ -16,11 +16,14 @@ import { HtmlInput } from '../components/inputs/HtmlInput.tsx';
 import { MarkdownInput } from '../components/inputs/MarkdownInput.tsx';
 import { SlugInput } from '../components/inputs/SlugInput.tsx';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyComponent = ComponentType<any>;
+
 /**
  * Configuration for a field type mapping.
  */
 export interface FieldTypeConfig {
-  component: ComponentType<Record<string, unknown>>;
+  component: AnyComponent;
   defaultProps?: Record<string, unknown>;
 }
 
@@ -29,47 +32,47 @@ export interface FieldTypeConfig {
  */
 const fieldTypeMappings: Record<FieldType, FieldTypeConfig> = {
   text: {
-    component: TextInput,
+    component: TextInput as AnyComponent,
   },
   textarea: {
-    component: TextInput,
+    component: TextInput as AnyComponent,
     defaultProps: {
       multiline: true,
       rows: 4,
     },
   },
   html: {
-    component: HtmlInput as ComponentType<Record<string, unknown>>,
+    component: HtmlInput as AnyComponent,
   },
   markdown: {
-    component: MarkdownInput as ComponentType<Record<string, unknown>>,
+    component: MarkdownInput as AnyComponent,
   },
   number: {
-    component: NumberInput,
+    component: NumberInput as AnyComponent,
   },
   checkbox: {
-    component: BooleanInput,
+    component: BooleanInput as AnyComponent,
   },
   date: {
-    component: DateInput,
+    component: DateInput as AnyComponent,
   },
   email: {
-    component: TextInput,
+    component: TextInput as AnyComponent,
     defaultProps: {
       type: 'email',
     },
   },
   select: {
-    component: SelectInput,
+    component: SelectInput as AnyComponent,
   },
   slug: {
-    component: SlugInput as ComponentType<Record<string, unknown>>,
+    component: SlugInput as AnyComponent,
   },
   hidden: {
-    component: () => null,
+    component: (() => null) as AnyComponent,
   },
   field: {
-    component: TextInput,
+    component: TextInput as AnyComponent,
   },
 };
 
@@ -132,18 +135,16 @@ export function buildSelectChoices(
 /**
  * Get the appropriate select component based on field metadata.
  */
-export function getSelectComponent(
-  metadata: FieldMetadata
-): ComponentType<Record<string, unknown>> {
+export function getSelectComponent(metadata: FieldMetadata): AnyComponent {
   const { multiple, autocomplete } = metadata;
 
   if (multiple) {
     return autocomplete
-      ? (AutocompleteArrayInput as ComponentType<Record<string, unknown>>)
-      : (SelectArrayInput as ComponentType<Record<string, unknown>>);
+      ? (AutocompleteArrayInput as AnyComponent)
+      : (SelectArrayInput as AnyComponent);
   }
 
   return autocomplete
-    ? (AutocompleteInput as ComponentType<Record<string, unknown>>)
-    : (SelectInput as ComponentType<Record<string, unknown>>);
+    ? (AutocompleteInput as AnyComponent)
+    : (SelectInput as AnyComponent);
 }

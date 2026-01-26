@@ -116,3 +116,21 @@ export interface OpenApiDocument {
   components?: OpenApiComponents;
   [key: string]: unknown;
 }
+
+/**
+ * Workflow state returned from the API.
+ */
+export interface WorkflowState {
+  place: string;
+  available_transitions: string[];
+}
+
+/**
+ * Workflow transition metadata for UI display.
+ */
+export interface TransitionMeta {
+  name: string;
+  label: string;
+  color: 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info';
+  icon?: string;
+}

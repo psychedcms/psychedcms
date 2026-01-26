@@ -2,6 +2,10 @@ upstream php-upstream {
     server php:9000;
 }
 
+upstream vite-upstream {
+    server node:5173;
+}
+
 server {
     listen 80;
     server_name ${APP_DOMAIN};
@@ -54,23 +58,21 @@ server {
     }
 
     # ==========================================================================
-    # Admin Routes (React Admin SPA)
+    # Admin Routes (React Admin SPA) - Proxy to Vite dev server
     # ==========================================================================
-    location /admin/ {
-        alias /var/www/admin/;
-        index index.html;
-        try_files $uri $uri/ /index.html;
+    location ^~ /admin {
+        proxy_pass http://vite-upstream;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
 
-        # Cache static assets
-        location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
-            expires 1y;
-            add_header Cache-Control "public, immutable";
-        }
-    }
-
-    # Redirect /admin to /admin/
-    location = /admin {
-        return 301 /admin/;
+        # Disable buffering for HMR
+        proxy_buffering off;
     }
 
     # ==========================================================================

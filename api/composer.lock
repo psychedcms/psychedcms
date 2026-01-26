@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "69415f0233207ed0210fa061505a1b64",
+    "content-hash": "0a574654b32d57f0647c1b5110167f12",
     "packages": [
         {
             "name": "api-platform/core",
@@ -2418,11 +2418,11 @@
         },
         {
             "name": "psychedcms/psychedcms-core",
-            "version": "dev-feature/api-platform-integration",
+            "version": "dev-main",
             "dist": {
                 "type": "path",
                 "url": "../packages/psychedcms-core",
-                "reference": "17a5d03b4679aab5b33b0f8d851143e243162f13"
+                "reference": "234eadfafbb6a1fd4fa1bc4e98064bcb2be0415c"
             },
             "require": {
                 "api-platform/core": "^4.0",
@@ -2453,6 +2453,51 @@
                 "proprietary"
             ],
             "description": "Core components for PsychedCMS - Content management building blocks for PHP domain entities",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "psychedcms/psychedcms-workflow",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "../packages/psychedcms-workflow",
+                "reference": "0056b691b922893cef8510bce361b114fc23f948"
+            },
+            "require": {
+                "php": ">=8.2",
+                "psychedcms/psychedcms-core": "^1.0 || @dev",
+                "symfony/config": "^7.4",
+                "symfony/dependency-injection": "^7.4",
+                "symfony/http-kernel": "^7.4",
+                "symfony/workflow": "^7.4"
+            },
+            "require-dev": {
+                "api-platform/core": "^4.0",
+                "doctrine/orm": "^3.0",
+                "phpunit/phpunit": "^10.0"
+            },
+            "suggest": {
+                "api-platform/core": "Required for automatic API workflow operations",
+                "doctrine/orm": "Required for workflow action persistence"
+            },
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-4": {
+                    "PsychedCms\\Workflow\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "PsychedCms\\Workflow\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Symfony Workflow integration for PsychedCMS - Content publishing lifecycle management",
             "transport-options": {
                 "symlink": true,
                 "relative": true
@@ -6174,6 +6219,100 @@
             "time": "2026-01-01T22:13:48+00:00"
         },
         {
+            "name": "symfony/workflow",
+            "version": "v7.4.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/workflow.git",
+                "reference": "b57181ea6241870c24d6bc5885f1111da360f6f2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/workflow/zipball/b57181ea6241870c24d6bc5885f1111da360f6f2",
+                "reference": "b57181ea6241870c24d6bc5885f1111da360f6f2",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.2",
+                "symfony/deprecation-contracts": "2.5|^3"
+            },
+            "conflict": {
+                "symfony/event-dispatcher": "<6.4"
+            },
+            "require-dev": {
+                "psr/log": "^1|^2|^3",
+                "symfony/config": "^6.4|^7.0|^8.0",
+                "symfony/console": "^6.4|^7.0|^8.0",
+                "symfony/dependency-injection": "^6.4|^7.0|^8.0",
+                "symfony/error-handler": "^6.4|^7.0|^8.0",
+                "symfony/event-dispatcher": "^6.4|^7.0|^8.0",
+                "symfony/expression-language": "^6.4|^7.0|^8.0",
+                "symfony/http-kernel": "^6.4|^7.0|^8.0",
+                "symfony/security-core": "^6.4|^7.0|^8.0",
+                "symfony/stopwatch": "^6.4|^7.0|^8.0",
+                "symfony/validator": "^6.4|^7.0|^8.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Workflow\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Grégoire Pineau",
+                    "email": "lyrixx@lyrixx.info"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Provides tools for managing a workflow or finite state machine",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "petrinet",
+                "place",
+                "state",
+                "statemachine",
+                "transition",
+                "workflow"
+            ],
+            "support": {
+                "source": "https://github.com/symfony/workflow/tree/v7.4.4"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/nicolas-grekas",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2026-01-08T15:58:55+00:00"
+        },
+        {
             "name": "symfony/yaml",
             "version": "v7.4.1",
             "source": {
@@ -8060,7 +8199,8 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "psychedcms/psychedcms-core": 20
+        "psychedcms/psychedcms-core": 20,
+        "psychedcms/psychedcms-workflow": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,
