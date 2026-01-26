@@ -7,6 +7,11 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\PostRepository;
 use Doctrine\ORM\Mapping as ORM;
+use PsychedCms\Core\Attribute\ContentType;
+use PsychedCms\Core\Attribute\Field\HtmlField;
+use PsychedCms\Core\Attribute\Field\SlugField;
+use PsychedCms\Core\Attribute\Field\TextareaField;
+use PsychedCms\Core\Attribute\Field\TextField;
 use PsychedCms\Core\Content\ContentInterface;
 use PsychedCms\Core\Content\ContentTrait;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -16,18 +21,22 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Index(columns: ['status'], name: 'idx_posts_status')]
 #[ORM\Index(columns: ['author_id'], name: 'idx_posts_author_id')]
 #[ApiResource(mercure: true)]
+#[ContentType(icon: 'Article')]
 class Post implements ContentInterface
 {
     use ContentTrait;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
+    #[TextField(label: 'Title', required: true, group: 'content')]
     private ?string $title = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
+    #[HtmlField(label: 'Content', group: 'content')]
     private ?string $content = null;
 
     #[ORM\Column(length: 500, nullable: true)]
+    #[TextareaField(label: 'Excerpt', group: 'content')]
     private ?string $excerpt = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
