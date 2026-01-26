@@ -57,7 +57,12 @@ export function TabbedFormGuesser({
 
   const resourceSchema = usePsychedSchema(resource);
 
+  // Debug logging
+  console.log('[TabbedFormGuesser] resource:', resource);
+  console.log('[TabbedFormGuesser] resourceSchema:', resourceSchema);
+
   if (!resourceSchema || resourceSchema.fields.size === 0) {
+    console.log('[TabbedFormGuesser] No schema found, falling back to SimpleForm');
     return <SimpleForm {...props} />;
   }
 
