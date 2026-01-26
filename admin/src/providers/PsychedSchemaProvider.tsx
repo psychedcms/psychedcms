@@ -29,9 +29,10 @@ export function PsychedSchemaProvider({
         setLoading(true);
         setError(null);
 
-        const response = await fetch(`${entrypoint}/docs.json`, {
+        // API Platform requires this specific Accept header for OpenAPI JSON
+        const response = await fetch(`${entrypoint}/docs`, {
           headers: {
-            Accept: 'application/json',
+            Accept: 'application/vnd.openapi+json',
           },
         });
 
