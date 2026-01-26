@@ -62,6 +62,67 @@ function isPrimarySchema(schemaName: string): boolean {
 }
 
 /**
+ * Extract properties from a schema, handling allOf structures.
+ */
+function extractProperties(
+  schema: Record<string, unknown>
+): Record<string, Record<string, unknown>> {
+  // Direct properties
+  if (schema.properties) {
+    return schema.properties as Record<string, Record<string, unknown>>;
+  }
+
+  // Handle allOf - merge properties from all schemas
+  if (Array.isArray(schema.allOf)) {
+    const merged: Record<string, Record<string, unknown>> = {};
+
+    for (const subSchema of schema.allOf) {
+      if (typeof subSchema === 'object' && subSchema !== null) {
+        const subProps = (subSchema as Record<string, unknown>)
+          .properties as Record<string, Record<string, unknown>> | undefined;
+
+        if (subProps) {
+          Object.assign(merged, subProps);
+        }
+      }
+    }
+
+    return merged;
+  }
+
+  return {};
+}
+
+/**
+ * Extract x-psychedcms from schema level, handling allOf structures.
+ */
+function extractContentType(
+  schema: Record<string, unknown>
+): ContentTypeMetadata | null {
+  // Direct x-psychedcms
+  if (schema['x-psychedcms']) {
+    return schema['x-psychedcms'] as ContentTypeMetadata;
+  }
+
+  // Handle allOf - look in each subschema
+  if (Array.isArray(schema.allOf)) {
+    for (const subSchema of schema.allOf) {
+      if (
+        typeof subSchema === 'object' &&
+        subSchema !== null &&
+        (subSchema as Record<string, unknown>)['x-psychedcms']
+      ) {
+        return (subSchema as Record<string, unknown>)[
+          'x-psychedcms'
+        ] as ContentTypeMetadata;
+      }
+    }
+  }
+
+  return null;
+}
+
+/**
  * Parse OpenAPI extensions from an OpenAPI document.
  * Extracts x-psychedcms metadata from both schema and property levels.
  */
@@ -85,18 +146,16 @@ export function parseOpenApiExtensions(
       continue;
     }
 
-    // Extract ContentType from schema-level x-psychedcms
-    const contentType: ContentTypeMetadata | null =
-      schema['x-psychedcms'] ?? null;
+    // Extract ContentType from schema-level x-psychedcms (handles allOf)
+    const contentType = extractContentType(schema);
 
-    // Extract field metadata from property-level x-psychedcms
+    // Extract field metadata from property-level x-psychedcms (handles allOf)
     const fields = new Map<string, FieldMetadata>();
+    const properties = extractProperties(schema);
 
-    if (schema.properties) {
-      for (const [propName, propSchema] of Object.entries(schema.properties)) {
-        if (propSchema['x-psychedcms']) {
-          fields.set(propName, propSchema['x-psychedcms']);
-        }
+    for (const [propName, propSchema] of Object.entries(properties)) {
+      if (propSchema['x-psychedcms']) {
+        fields.set(propName, propSchema['x-psychedcms'] as FieldMetadata);
       }
     }
 

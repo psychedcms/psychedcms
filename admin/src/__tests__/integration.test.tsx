@@ -269,8 +269,8 @@ describe('Integration: Schema Provider -> Hooks -> Components', () => {
       expect(screen.getByTestId('result').textContent).toBe('Posts');
     });
 
-    expect(mockFetch).toHaveBeenCalledWith('http://localhost/api/docs.json', {
-      headers: { Accept: 'application/json' },
+    expect(mockFetch).toHaveBeenCalledWith('http://localhost/api/docs', {
+      headers: { Accept: 'application/vnd.openapi+json' },
     });
   });
 });
