@@ -25,6 +25,7 @@ RUN apk add --no-cache \
     imagemagick-dev \
     linux-headers \
     su-exec \
+    rabbitmq-c-dev \
     $PHPIZE_DEPS
 
 # Configure and install PHP extensions
@@ -46,6 +47,10 @@ RUN pecl install imagick \
 # Install APCu for caching
 RUN pecl install apcu \
     && docker-php-ext-enable apcu
+
+# Install AMQP for RabbitMQ messaging
+RUN pecl install amqp \
+    && docker-php-ext-enable amqp
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer

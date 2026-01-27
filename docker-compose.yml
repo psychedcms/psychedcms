@@ -24,8 +24,11 @@ services:
       MERCURE_URL: ${MERCURE_URL}
       MERCURE_PUBLIC_URL: ${MERCURE_PUBLIC_URL}
       MERCURE_JWT_SECRET: ${MERCURE_JWT_SECRET}
+      MESSENGER_TRANSPORT_DSN: ${MESSENGER_TRANSPORT_DSN}
     depends_on:
       database:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
     networks:
       - psyched
@@ -111,6 +114,27 @@ services:
       - psyched
 
   # ===========================================================================
+  # RabbitMQ (Message Queue)
+  # ===========================================================================
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-guest}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmq-diagnostics -q ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - psyched
+
+  # ===========================================================================
   # MinIO (S3-compatible object storage) - Optional
   # ===========================================================================
   minio:
@@ -153,5 +177,6 @@ networks:
 
 volumes:
   postgres_data:
+  rabbitmq_data:
   minio_data:
   elasticsearch_data:

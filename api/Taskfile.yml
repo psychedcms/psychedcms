@@ -306,3 +306,98 @@ tasks:
     cmds:
       - git -C {{.PACKAGES_DIR}}/psychedcms-workflow branch -d feature/{{.FEATURE}} || true
       - git -C {{.PACKAGES_DIR}}/psychedcms-workflow push origin --delete feature/{{.FEATURE}} || true
+
+  # ===========================================================================
+  # Package Testing - psychedcms-calendar
+  # ===========================================================================
+  test:calendar:
+    desc: Run tests for psychedcms-calendar package
+    cmds:
+      - docker compose -f {{.COMPOSE_FILE}} exec php bin/phpunit {{.PACKAGES_DIR}}/psychedcms-calendar/tests/
+
+  # ===========================================================================
+  # Git - psychedcms-calendar (atomic operations)
+  # ===========================================================================
+  git:status:calendar:
+    desc: Show git status for psychedcms-calendar
+    cmds:
+      - echo "=== psychedcms-calendar ===" && git -C {{.PACKAGES_DIR}}/psychedcms-calendar status -s && git -C {{.PACKAGES_DIR}}/psychedcms-calendar log -1 --oneline
+
+  git:branch:calendar:
+    desc: Show current branch for psychedcms-calendar
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-calendar branch --show-current
+
+  # Feature branch operations
+  feature:ensure:calendar:
+    desc: "Ensure feature branch exists on psychedcms-calendar, create if needed"
+    vars:
+      FEATURE: '{{.FEATURE}}'
+    cmds:
+      - ../scripts/git-ensure-branch.sh {{.PACKAGES_DIR}}/psychedcms-calendar feature/{{.FEATURE}}
+
+  feature:checkout:calendar:
+    desc: "Checkout feature branch on psychedcms-calendar"
+    vars:
+      FEATURE: '{{.FEATURE}}'
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-calendar checkout feature/{{.FEATURE}}
+
+  # Commit operations (with lazy branch creation)
+  commit:calendar:
+    desc: "Commit psychedcms-calendar with feature reference (creates branch if needed)"
+    vars:
+      FEATURE: '{{.FEATURE}}'
+      MESSAGE: '{{.MESSAGE}}'
+    cmds:
+      - task: feature:ensure:calendar
+        vars:
+          FEATURE: '{{.FEATURE}}'
+      - cmd: 'git -C {{.PACKAGES_DIR}}/psychedcms-calendar add .'
+      - cmd: 'git -C {{.PACKAGES_DIR}}/psychedcms-calendar commit -m "[feature/{{.FEATURE}}] calendar: {{.MESSAGE}}"'
+
+  # Push/Pull operations
+  push:calendar:
+    desc: Push psychedcms-calendar current branch
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-calendar push -u origin $(git -C {{.PACKAGES_DIR}}/psychedcms-calendar branch --show-current)
+
+  pull:calendar:
+    desc: 'Pull psychedcms-calendar (current branch or specified via BRANCH=x)'
+    vars:
+      BRANCH:
+        sh: echo "${BRANCH:-$(git -C {{.PACKAGES_DIR}}/psychedcms-calendar branch --show-current)}"
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-calendar checkout {{.BRANCH}}
+      - git -C {{.PACKAGES_DIR}}/psychedcms-calendar pull origin {{.BRANCH}}
+
+  rebase:calendar:
+    desc: "Rebase current feature branch onto main on psychedcms-calendar (updates main, rebases, force pushes)"
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-calendar fetch -p origin main:main
+      - git -C {{.PACKAGES_DIR}}/psychedcms-calendar rebase main
+      - git -C {{.PACKAGES_DIR}}/psychedcms-calendar push --force-with-lease origin $(git -C {{.PACKAGES_DIR}}/psychedcms-calendar branch --show-current)
+
+  # Merge operations
+  feature:merge:calendar:
+    desc: "Squash merge feature to main on psychedcms-calendar"
+    vars:
+      FEATURE: '{{.FEATURE}}'
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-calendar checkout main
+      - git -C {{.PACKAGES_DIR}}/psychedcms-calendar pull origin main
+      - git -C {{.PACKAGES_DIR}}/psychedcms-calendar merge --squash feature/{{.FEATURE}}
+      - 'git -C {{.PACKAGES_DIR}}/psychedcms-calendar commit -m "feat: {{.FEATURE}}"'
+
+  feature:push-merge:calendar:
+    desc: Push merged main on psychedcms-calendar
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-calendar push origin main
+
+  feature:cleanup:calendar:
+    desc: "Delete feature branch on psychedcms-calendar (local and remote)"
+    vars:
+      FEATURE: '{{.FEATURE}}'
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-calendar branch -d feature/{{.FEATURE}} || true
+      - git -C {{.PACKAGES_DIR}}/psychedcms-calendar push origin --delete feature/{{.FEATURE}} || true

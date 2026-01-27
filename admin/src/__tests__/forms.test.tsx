@@ -1,5 +1,5 @@
-import { render, screen, waitFor } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
 import type { ReactNode } from 'react';
 import { AdminContext, SimpleForm, ResourceContextProvider, ResourceDefinitionContextProvider } from 'react-admin';
 
@@ -7,6 +7,7 @@ import { PsychedSchemaContext } from '../providers/PsychedSchemaContext.ts';
 import type { PsychedSchema } from '../types/psychedcms.ts';
 import { PsychedInputGuesser } from '../components/inputs/PsychedInputGuesser.tsx';
 import { TabbedFormGuesser } from '../components/forms/TabbedFormGuesser.tsx';
+import { ScheduleDialog } from '../components/forms/ScheduleDialog.tsx';
 
 const dataProvider = {
   getList: () => Promise.resolve({ data: [], total: 0 }),
@@ -323,5 +324,75 @@ describe('TabbedFormGuesser', () => {
 
     const emailInput = await screen.findByRole('textbox', { name: /email/i });
     expect(emailInput).toBeDefined();
+  });
+});
+
+describe('ScheduleDialog', () => {
+  it('renders dialog when open', () => {
+    const onClose = vi.fn();
+    const onConfirm = vi.fn();
+
+    render(
+      <ScheduleDialog open={true} onClose={onClose} onConfirm={onConfirm} />
+    );
+
+    expect(screen.getByText('Schedule Publication')).toBeDefined();
+    expect(screen.getByText(/select date/i)).toBeDefined();
+    expect(screen.getByRole('button', { name: /cancel/i })).toBeDefined();
+    expect(screen.getByRole('button', { name: /schedule/i })).toBeDefined();
+  });
+
+  it('does not render when closed', () => {
+    const onClose = vi.fn();
+    const onConfirm = vi.fn();
+
+    render(
+      <ScheduleDialog open={false} onClose={onClose} onConfirm={onConfirm} />
+    );
+
+    expect(screen.queryByText('Schedule Publication')).toBeNull();
+  });
+
+  it('calls onClose when cancel is clicked', () => {
+    const onClose = vi.fn();
+    const onConfirm = vi.fn();
+
+    render(
+      <ScheduleDialog open={true} onClose={onClose} onConfirm={onConfirm} />
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /cancel/i }));
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it('calls onConfirm with ISO date when schedule is clicked', async () => {
+    const onClose = vi.fn();
+    const onConfirm = vi.fn();
+
+    render(
+      <ScheduleDialog open={true} onClose={onClose} onConfirm={onConfirm} />
+    );
+
+    // Default value is 1 hour in the future, so just clicking schedule should work
+    fireEvent.click(screen.getByRole('button', { name: /schedule/i }));
+
+    expect(onConfirm).toHaveBeenCalled();
+    const calledArg = onConfirm.mock.calls[0][0];
+    // Should be ISO 8601 ATOM format with timezone
+    expect(calledArg).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}$/);
+  });
+
+  it('disables buttons when loading', () => {
+    const onClose = vi.fn();
+    const onConfirm = vi.fn();
+
+    render(
+      <ScheduleDialog open={true} onClose={onClose} onConfirm={onConfirm} loading={true} />
+    );
+
+    const cancelButton = screen.getByRole('button', { name: /cancel/i });
+    const scheduleButton = screen.getByRole('button', { name: /scheduling/i });
+    expect(cancelButton.hasAttribute('disabled')).toBe(true);
+    expect(scheduleButton.hasAttribute('disabled')).toBe(true);
   });
 });

@@ -32,6 +32,12 @@ const TRANSITION_META: Record<string, TransitionMeta & { priority: number }> = {
     color: 'warning',
     priority: 6,
   },
+  unschedule: {
+    name: 'unschedule',
+    label: 'Unschedule',
+    color: 'secondary',
+    priority: 10,
+  },
   request_changes: {
     name: 'request_changes',
     label: 'Request Changes',
@@ -120,7 +126,7 @@ interface UseWorkflowStateResult {
   workflowState: WorkflowState | null;
   primaryTransition: string | null;
   secondaryTransitions: string[];
-  applyTransition: (transition: string) => Promise<void>;
+  applyTransition: (transition: string, data?: Record<string, unknown>) => Promise<void>;
   refresh: () => void;
 }
 
@@ -180,7 +186,7 @@ export function useWorkflowState(
   }, [fetchWorkflowState]);
 
   const applyTransition = useCallback(
-    async (transition: string) => {
+    async (transition: string, data?: Record<string, unknown>) => {
       if (!resource || !recordId || !entrypoint) {
         throw new Error('Resource, record ID, or entrypoint not available');
       }
@@ -196,6 +202,7 @@ export function useWorkflowState(
             Accept: 'application/ld+json',
             'Content-Type': 'application/ld+json',
           },
+          body: data ? JSON.stringify(data) : undefined,
         });
 
         if (!response.ok) {

@@ -14,6 +14,7 @@ import {
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { useRecordContext, useResourceContext, useRefresh } from 'react-admin';
 import { useWorkflowState, getTransitionMeta } from '../../hooks/useWorkflowState.ts';
+import { ScheduleDialog } from './ScheduleDialog.tsx';
 
 interface WorkflowButtonProps {
   resource?: string;
@@ -31,6 +32,8 @@ export function WorkflowButton({ resource: resourceProp }: WorkflowButtonProps) 
 
   const [open, setOpen] = useState(false);
   const [applying, setApplying] = useState(false);
+  const [scheduleDialogOpen, setScheduleDialogOpen] = useState(false);
+  const [pendingTransition, setPendingTransition] = useState<string | null>(null);
   const anchorRef = useRef<HTMLDivElement>(null);
 
   const {
@@ -49,25 +52,46 @@ export function WorkflowButton({ resource: resourceProp }: WorkflowButtonProps) 
   const primaryMeta = getTransitionMeta(primaryTransition);
   const hasSecondary = secondaryTransitions.length > 0;
 
-  const handlePrimaryClick = async () => {
+  const handleTransitionClick = (transition: string) => {
+    if (transition === 'schedule') {
+      setPendingTransition(transition);
+      setScheduleDialogOpen(true);
+      setOpen(false);
+    } else {
+      executeTransition(transition);
+    }
+  };
+
+  const executeTransition = async (transition: string, data?: Record<string, unknown>) => {
     setApplying(true);
     try {
-      await applyTransition(primaryTransition);
+      await applyTransition(transition, data);
       refresh();
     } finally {
       setApplying(false);
     }
   };
 
-  const handleSecondaryClick = async (transition: string) => {
+  const handlePrimaryClick = () => {
+    handleTransitionClick(primaryTransition);
+  };
+
+  const handleSecondaryClick = (transition: string) => {
     setOpen(false);
-    setApplying(true);
-    try {
-      await applyTransition(transition);
-      refresh();
-    } finally {
-      setApplying(false);
+    handleTransitionClick(transition);
+  };
+
+  const handleScheduleConfirm = async (scheduledAt: string) => {
+    if (pendingTransition) {
+      await executeTransition(pendingTransition, { scheduledAt });
+      setScheduleDialogOpen(false);
+      setPendingTransition(null);
     }
+  };
+
+  const handleScheduleDialogClose = () => {
+    setScheduleDialogOpen(false);
+    setPendingTransition(null);
   };
 
   const handleToggle = () => {
@@ -86,15 +110,23 @@ export function WorkflowButton({ resource: resourceProp }: WorkflowButtonProps) 
   // Single button if no secondary transitions
   if (!hasSecondary) {
     return (
-      <Button
-        variant="contained"
-        color={primaryMeta.color}
-        onClick={handlePrimaryClick}
-        disabled={isDisabled}
-        startIcon={applying ? <CircularProgress size={16} color="inherit" /> : undefined}
-      >
-        {primaryMeta.label}
-      </Button>
+      <>
+        <Button
+          variant="contained"
+          color={primaryMeta.color}
+          onClick={handlePrimaryClick}
+          disabled={isDisabled}
+          startIcon={applying ? <CircularProgress size={16} color="inherit" /> : undefined}
+        >
+          {primaryMeta.label}
+        </Button>
+        <ScheduleDialog
+          open={scheduleDialogOpen}
+          onClose={handleScheduleDialogClose}
+          onConfirm={handleScheduleConfirm}
+          loading={applying}
+        />
+      </>
     );
   }
 
@@ -153,6 +185,12 @@ export function WorkflowButton({ resource: resourceProp }: WorkflowButtonProps) 
           </Grow>
         )}
       </Popper>
+      <ScheduleDialog
+        open={scheduleDialogOpen}
+        onClose={handleScheduleDialogClose}
+        onConfirm={handleScheduleConfirm}
+        loading={applying}
+      />
     </>
   );
 }
