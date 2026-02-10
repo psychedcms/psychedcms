@@ -1,0 +1,27 @@
+# Documentation Navigation
+# This file defines the sidebar structure for the docs
+
+nav:
+  - title: Getting Started
+    items:
+      - index.md
+      - installation.md
+
+  - title: Core Concepts
+    items:
+      - content-types.md
+      - fields.md
+
+  - title: Features
+    items:
+      - workflows.md
+      - scheduling.md
+
+  - title: Reference
+    items:
+      - api.md
+      - admin-ui.md
+
+  - title: Extending
+    items:
+      - extending.md

@@ -2,6 +2,7 @@ import { ResourceGuesser, type ResourceGuesserProps } from '@api-platform/admin'
 
 import { PsychedCreateGuesser } from './PsychedCreateGuesser.tsx';
 import { PsychedEditGuesser } from './PsychedEditGuesser.tsx';
+import { PsychedShowGuesser } from './PsychedShowGuesser.tsx';
 import { PsychedListGuesser } from './PsychedListGuesser.tsx';
 
 /**
@@ -16,6 +17,7 @@ export function PsychedResourceGuesser(props: ResourceGuesserProps) {
     <ResourceGuesser
       {...props}
       list={PsychedListGuesser}
+      show={PsychedShowGuesser}
       create={PsychedCreateGuesser}
       edit={PsychedEditGuesser}
     />

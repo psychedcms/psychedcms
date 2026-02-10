@@ -15,6 +15,8 @@ import type { FieldType, FieldMetadata } from '../types/psychedcms.ts';
 import { HtmlInput } from '../components/inputs/HtmlInput.tsx';
 import { MarkdownInput } from '../components/inputs/MarkdownInput.tsx';
 import { SlugInput } from '../components/inputs/SlugInput.tsx';
+import { TaxonomyInput } from '../components/inputs/TaxonomyInput.tsx';
+import { EntityTaxonomyInput } from '../components/inputs/EntityTaxonomyInput.tsx';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyComponent = ComponentType<any>;
@@ -67,6 +69,12 @@ const fieldTypeMappings: Record<FieldType, FieldTypeConfig> = {
   },
   slug: {
     component: SlugInput as AnyComponent,
+  },
+  taxonomy: {
+    component: TaxonomyInput as AnyComponent,
+  },
+  entity_taxonomy: {
+    component: EntityTaxonomyInput as AnyComponent,
   },
   hidden: {
     component: (() => null) as AnyComponent,

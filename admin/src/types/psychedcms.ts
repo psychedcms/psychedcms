@@ -35,6 +35,8 @@ export type FieldType =
   | 'select'
   | 'slug'
   | 'hidden'
+  | 'taxonomy'
+  | 'entity_taxonomy'
   | 'field';
 
 /**
@@ -70,6 +72,14 @@ export interface FieldMetadata {
   // SlugField extras
   uses?: string | string[];
   allowNumeric?: boolean;
+  // TaxonomyField extras
+  taxonomy?: string;
+  allowCreate?: boolean;
+  min?: number;
+  max?: number;
+  // EntityTaxonomyField extras
+  order?: string;
+  filter?: string;
 }
 
 /**

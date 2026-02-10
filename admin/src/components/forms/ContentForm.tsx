@@ -1,9 +1,9 @@
+import { useState } from 'react';
 import {
   SimpleForm,
-  TabbedForm,
   useResourceContext,
 } from 'react-admin';
-import { Box, Card } from '@mui/material';
+import { Box, Card, Tab, Tabs } from '@mui/material';
 
 import { usePsychedSchema } from '../../hooks/usePsychedSchema.ts';
 import { PsychedInputGuesser } from '../inputs/PsychedInputGuesser.tsx';
@@ -38,16 +38,22 @@ function humanizeGroupName(group: string): string {
 }
 
 /**
- * Two-column layout component that goes INSIDE the form.
- * Uses CSS Grid for more reliable two-column layout.
+ * Inner layout rendered inside SimpleForm.
+ * Two-column grid: left (2/3) has tabbed content, right (1/3) has sidebar.
+ * The sidebar persists across all tabs.
  */
-function TwoColumnFormContent({
-  children,
-  resource
+function ContentFormLayout({
+  resource,
+  groupOrder,
+  groupedFields,
 }: {
-  children: React.ReactNode;
   resource: string;
+  groupOrder: string[];
+  groupedFields: Map<string, string[]>;
 }) {
+  const [activeTab, setActiveTab] = useState(0);
+  const hasTabs = groupOrder.length > 1;
+
   return (
     <Box
       sx={{
@@ -58,12 +64,36 @@ function TwoColumnFormContent({
         alignItems: 'start',
       }}
     >
-      {/* Left block: Form fields */}
+      {/* Left block: tabbed form fields */}
       <Card sx={{ p: 2 }} variant="outlined">
-        {children}
+        {hasTabs && (
+          <Tabs
+            value={activeTab}
+            onChange={(_, v) => setActiveTab(v)}
+            sx={{ mb: 2, borderBottom: 1, borderColor: 'divider' }}
+          >
+            {groupOrder.map((group) => (
+              <Tab key={group} label={humanizeGroupName(group)} />
+            ))}
+          </Tabs>
+        )}
+
+        {groupOrder.map((group, index) => {
+          const fields = groupedFields.get(group) ?? [];
+          // When tabs exist, only render the active tab's fields.
+          // Hidden tabs stay mounted (display:none) so form state is preserved.
+          if (hasTabs) {
+            return (
+              <Box key={group} sx={{ display: activeTab === index ? 'block' : 'none' }}>
+                <FieldGroup fields={fields} resource={resource} />
+              </Box>
+            );
+          }
+          return <FieldGroup key={group} fields={fields} resource={resource} />;
+        })}
       </Card>
 
-      {/* Right block: Sidebar */}
+      {/* Right block: sidebar - always visible */}
       <Box sx={{ minWidth: 280 }}>
         <EditSidebar resource={resource} />
       </Box>
@@ -73,8 +103,8 @@ function TwoColumnFormContent({
 
 /**
  * Two-column content form layout.
- * Left (2/3): Card with form fields
- * Right (1/3): Sidebar with save button and publication options
+ * Left (2/3): Card with tabbed form fields
+ * Right (1/3): Sidebar with save button and publication options (persists across tabs)
  */
 export function ContentForm({ resource: resourceProp }: ContentFormProps) {
   const resourceFromContext = useResourceContext();
@@ -84,47 +114,14 @@ export function ContentForm({ resource: resourceProp }: ContentFormProps) {
   const groupedFields = groupFieldsByGroup(resourceSchema?.fields);
   const groupOrder = getGroupOrder(resourceSchema?.fields);
 
-  // Single group or no schema - use SimpleForm
-  if (groupOrder.length <= 1) {
-    const fields = groupOrder.length === 1 ? groupedFields.get(groupOrder[0]) ?? [] : [];
-
-    return (
-      <SimpleForm toolbar={false} sx={{ p: 2, '& .RaSimpleForm-form': { width: '100%' } }}>
-        <TwoColumnFormContent resource={resource}>
-          {fields.map((fieldName) => (
-            <PsychedInputGuesser key={fieldName} source={fieldName} resource={resource} />
-          ))}
-        </TwoColumnFormContent>
-      </SimpleForm>
-    );
-  }
-
-  // Multiple groups - use TabbedForm with sidebar in first tab
   return (
-    <TabbedForm toolbar={false} sx={{ p: 2, '& .RaTabbedForm-content': { width: '100%' } }}>
-      {groupOrder.map((group, index) => {
-        const fields = groupedFields.get(group) ?? [];
-        const label = humanizeGroupName(group);
-
-        if (index === 0) {
-          // First tab includes sidebar
-          return (
-            <TabbedForm.Tab key={group} label={label}>
-              <TwoColumnFormContent resource={resource}>
-                <FieldGroup fields={fields} resource={resource} />
-              </TwoColumnFormContent>
-            </TabbedForm.Tab>
-          );
-        }
-
-        // Other tabs without sidebar
-        return (
-          <TabbedForm.Tab key={group} label={label}>
-            <FieldGroup fields={fields} resource={resource} />
-          </TabbedForm.Tab>
-        );
-      })}
-    </TabbedForm>
+    <SimpleForm toolbar={false} sx={{ p: 0, '& .RaSimpleForm-form': { width: '100%' } }}>
+      <ContentFormLayout
+        resource={resource}
+        groupOrder={groupOrder}
+        groupedFields={groupedFields}
+      />
+    </SimpleForm>
   );
 }
 

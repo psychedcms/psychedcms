@@ -15,6 +15,8 @@ import {
   buildSelectChoices,
 } from '../../utils/fieldTypeMapping.tsx';
 import { SlugInput } from './SlugInput.tsx';
+import { TaxonomyInput } from './TaxonomyInput.tsx';
+import { EntityTaxonomyInput } from './EntityTaxonomyInput.tsx';
 
 interface PsychedInputGuesserProps extends Omit<InputProps, 'source'> {
   source: string;
@@ -83,6 +85,33 @@ export function PsychedInputGuesser({
       return <AutocompleteInput {...baseProps} choices={choices} />;
     }
     return <SelectInput {...baseProps} choices={choices} />;
+  }
+
+  if (type === 'taxonomy') {
+    return (
+      <TaxonomyInput
+        source={source}
+        taxonomyType={fieldMetadata.taxonomy ?? ''}
+        multiple={fieldMetadata.multiple ?? false}
+        allowCreate={fieldMetadata.allowCreate ?? false}
+        label={typeof label === 'string' ? label : undefined}
+        helperText={typeof info === 'string' ? info : undefined}
+        isRequired={required ?? undefined}
+      />
+    );
+  }
+
+  if (type === 'entity_taxonomy') {
+    return (
+      <EntityTaxonomyInput
+        source={source}
+        reference={source}
+        multiple={fieldMetadata.multiple ?? false}
+        label={typeof label === 'string' ? label : undefined}
+        helperText={typeof info === 'string' ? info : undefined}
+        isRequired={required ?? undefined}
+      />
+    );
   }
 
   if (type === 'slug' && fieldMetadata.uses) {

@@ -20,6 +20,7 @@
     "@tiptap/react": "^3.17.1",
     "@tiptap/starter-kit": "^3.17.1",
     "dayjs": "^1.11.19",
+    "playwright": "^1.58.2",
     "ra-input-rich-text": "^5.14.0",
     "react": "^19.2.0",
     "react-admin": "^5.14.0",

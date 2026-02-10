@@ -1,14 +1,59 @@
-import { List, Datagrid, TextField, EditButton, ShowButton, useResourceContext } from 'react-admin';
-import type { ListProps } from 'react-admin';
+import {
+  List,
+  Datagrid,
+  TextField,
+  FunctionField,
+  ReferenceField,
+  ReferenceArrayField,
+  SingleFieldList,
+  ChipField,
+  EditButton,
+  ShowButton,
+  useResourceContext,
+} from 'react-admin';
+import type { ListProps, RaRecord } from 'react-admin';
 import { usePsychedSchema } from '../../hooks/index.ts';
 import type { FieldMetadata } from '../../types/psychedcms.ts';
 
 /**
  * Get the appropriate react-admin field component for a field type.
  */
-function getFieldComponent(fieldName: string, _meta: FieldMetadata) {
-  // For now, use TextField for everything - can be extended later
-  return <TextField key={fieldName} source={fieldName} />;
+function getFieldComponent(fieldName: string, meta: FieldMetadata) {
+  if (meta.type === 'entity_taxonomy') {
+    if (meta.multiple) {
+      return (
+        <ReferenceArrayField key={fieldName} source={fieldName} reference={fieldName} label={meta.label}>
+          <SingleFieldList linkType={false}>
+            <ChipField source="name" size="small" />
+          </SingleFieldList>
+        </ReferenceArrayField>
+      );
+    }
+    return (
+      <ReferenceField key={fieldName} source={fieldName} reference={fieldName} link={false} label={meta.label}>
+        <TextField source="name" />
+      </ReferenceField>
+    );
+  }
+
+  if (meta.type === 'taxonomy') {
+    if (meta.multiple) {
+      return (
+        <ReferenceArrayField key={fieldName} source={fieldName} reference="taxonomies" label={meta.label}>
+          <SingleFieldList linkType={false}>
+            <ChipField source="name" size="small" />
+          </SingleFieldList>
+        </ReferenceArrayField>
+      );
+    }
+    return (
+      <ReferenceField key={fieldName} source={fieldName} reference="taxonomies" link={false} label={meta.label}>
+        <TextField source="name" />
+      </ReferenceField>
+    );
+  }
+
+  return <TextField key={fieldName} source={fieldName} label={meta.label} />;
 }
 
 /**
@@ -46,6 +91,21 @@ function getListFields(fields: Map<string, FieldMetadata>): string[] {
 }
 
 /**
+ * Fallback field for resources without x-psychedcms schema.
+ * Tries common display fields before falling back to id.
+ */
+function FallbackNameField() {
+  return (
+    <FunctionField
+      label="Name"
+      render={(record: RaRecord) =>
+        record.name ?? record.email ?? record.title ?? record.label ?? String(record.id)
+      }
+    />
+  );
+}
+
+/**
  * Inner component that uses the resource context to get the schema.
  */
 function PsychedListGuesserInner() {
@@ -64,7 +124,7 @@ function PsychedListGuesserInner() {
         }
         return <TextField key={fieldName} source={fieldName} />;
       })}
-      {listFields.length === 0 && <TextField source="id" label="ID" />}
+      {listFields.length === 0 && <FallbackNameField />}
       <ShowButton />
       <EditButton />
     </Datagrid>
