@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import type { MutableRefObject } from 'react';
 import {
   SimpleForm,
   useResourceContext,
@@ -6,12 +7,14 @@ import {
 import { Box, Card, Tab, Tabs } from '@mui/material';
 
 import { usePsychedSchema } from '../../hooks/usePsychedSchema.ts';
-import { PsychedInputGuesser } from '../inputs/PsychedInputGuesser.tsx';
 import { FieldGroup } from './FieldGroup.tsx';
 import { EditSidebar } from './EditSidebar.tsx';
+import { TranslatableFormManager } from './TranslatableFormManager.tsx';
+import type { TranslatableSaveHandle } from './TranslatableFormManager.tsx';
 
 interface ContentFormProps {
   resource?: string;
+  translatableSaveRef?: MutableRefObject<TranslatableSaveHandle | null>;
 }
 
 // Fields handled by the sidebar, excluded from main form
@@ -46,58 +49,67 @@ function ContentFormLayout({
   resource,
   groupOrder,
   groupedFields,
+  translatableSaveRef,
 }: {
   resource: string;
   groupOrder: string[];
   groupedFields: Map<string, string[]>;
+  translatableSaveRef?: MutableRefObject<TranslatableSaveHandle | null>;
 }) {
   const [activeTab, setActiveTab] = useState(0);
   const hasTabs = groupOrder.length > 1;
 
   return (
-    <Box
-      sx={{
-        display: 'grid',
-        gridTemplateColumns: { xs: '1fr', md: '2fr 1fr' },
-        gap: 3,
-        width: '100%',
-        alignItems: 'start',
-      }}
-    >
-      {/* Left block: tabbed form fields */}
-      <Card sx={{ p: 2 }} variant="outlined">
-        {hasTabs && (
-          <Tabs
-            value={activeTab}
-            onChange={(_, v) => setActiveTab(v)}
-            sx={{ mb: 2, borderBottom: 1, borderColor: 'divider' }}
-          >
-            {groupOrder.map((group) => (
-              <Tab key={group} label={humanizeGroupName(group)} />
-            ))}
-          </Tabs>
-        )}
+    <>
+      {/* Renderless: manages per-locale form value swapping */}
+      {translatableSaveRef && (
+        <TranslatableFormManager resource={resource} saveHandleRef={translatableSaveRef} />
+      )}
 
-        {groupOrder.map((group, index) => {
-          const fields = groupedFields.get(group) ?? [];
-          // When tabs exist, only render the active tab's fields.
-          // Hidden tabs stay mounted (display:none) so form state is preserved.
-          if (hasTabs) {
-            return (
-              <Box key={group} sx={{ display: activeTab === index ? 'block' : 'none' }}>
-                <FieldGroup fields={fields} resource={resource} />
-              </Box>
-            );
-          }
-          return <FieldGroup key={group} fields={fields} resource={resource} />;
-        })}
-      </Card>
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', md: '2fr 1fr' },
+          gap: 3,
+          width: '100%',
+          alignItems: 'start',
+        }}
+      >
+        {/* Left block: tabbed form fields */}
+        <Card sx={{ p: 2 }} variant="outlined">
+          {hasTabs && (
+            <Tabs
+              value={activeTab}
+              onChange={(_, v) => setActiveTab(v)}
+              sx={{ mb: 2, borderBottom: 1, borderColor: 'divider' }}
+            >
+              {groupOrder.map((group) => (
+                <Tab key={group} label={humanizeGroupName(group)} />
+              ))}
+            </Tabs>
+          )}
 
-      {/* Right block: sidebar - always visible */}
-      <Box sx={{ minWidth: 280 }}>
-        <EditSidebar resource={resource} />
+          {groupOrder.map((group, index) => {
+            const fields = groupedFields.get(group) ?? [];
+            // When tabs exist, only render the active tab's fields.
+            // Hidden tabs stay mounted (display:none) so form state is preserved.
+            if (hasTabs) {
+              return (
+                <Box key={group} sx={{ display: activeTab === index ? 'block' : 'none' }}>
+                  <FieldGroup fields={fields} resource={resource} />
+                </Box>
+              );
+            }
+            return <FieldGroup key={group} fields={fields} resource={resource} />;
+          })}
+        </Card>
+
+        {/* Right block: sidebar - always visible */}
+        <Box sx={{ minWidth: 280 }}>
+          <EditSidebar resource={resource} />
+        </Box>
       </Box>
-    </Box>
+    </>
   );
 }
 
@@ -106,7 +118,7 @@ function ContentFormLayout({
  * Left (2/3): Card with tabbed form fields
  * Right (1/3): Sidebar with save button and publication options (persists across tabs)
  */
-export function ContentForm({ resource: resourceProp }: ContentFormProps) {
+export function ContentForm({ resource: resourceProp, translatableSaveRef }: ContentFormProps) {
   const resourceFromContext = useResourceContext();
   const resource = resourceProp ?? resourceFromContext ?? '';
   const resourceSchema = usePsychedSchema(resource);
@@ -120,6 +132,7 @@ export function ContentForm({ resource: resourceProp }: ContentFormProps) {
         resource={resource}
         groupOrder={groupOrder}
         groupedFields={groupedFields}
+        translatableSaveRef={translatableSaveRef}
       />
     </SimpleForm>
   );

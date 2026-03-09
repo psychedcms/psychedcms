@@ -5,16 +5,20 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\PostRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 use PsychedCms\Core\Attribute\ContentType;
 use PsychedCms\Core\Attribute\Field\HtmlField;
 use PsychedCms\Core\Attribute\Field\TextareaField;
 use PsychedCms\Core\Attribute\Field\TextField;
 use PsychedCms\Core\Content\ContentTrait;
+use PsychedCms\Core\Content\TranslatableInterface;
+use PsychedCms\Core\Content\TranslatableTrait;
 use PsychedCms\Media\Attribute\ImageField;
 use PsychedCms\Media\Entity\Media;
 use PsychedCms\Taxonomy\Attribute\EntityTaxonomyField;
@@ -31,23 +35,28 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Index(columns: ['author_id'], name: 'idx_posts_author_id')]
 #[ApiResource(mercure: true)]
 #[ApiFilter(TaxonomySlugFilter::class, properties: ['tags'])]
-#[ContentType(icon: 'Article')]
-class Post implements PublicationWorkflowAwareInterface
+#[ContentType(icon: 'Article', locales: ['en', 'fr'])]
+#[Gedmo\TranslationEntity(class: PostTranslation::class)]
+class Post implements PublicationWorkflowAwareInterface, TranslatableInterface
 {
     use ContentTrait;
     use PublicationWorkflowTrait;
+    use TranslatableTrait;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
-    #[TextField(label: 'Title', required: true, group: 'content')]
+    #[Gedmo\Translatable]
+    #[TextField(label: 'Title', required: true, group: 'content', translatable: true)]
     private ?string $title = null;
 
     #[ORM\Column(length: 500, nullable: true)]
-    #[TextareaField(label: 'Excerpt', group: 'content')]
+    #[Gedmo\Translatable]
+    #[TextareaField(label: 'Excerpt', group: 'content', translatable: true)]
     private ?string $excerpt = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
-    #[HtmlField(label: 'Content', group: 'content')]
+    #[Gedmo\Translatable]
+    #[HtmlField(label: 'Content', group: 'content', translatable: true)]
     private ?string $content = null;
 
     #[ORM\ManyToOne(targetEntity: Media::class)]
@@ -69,10 +78,16 @@ class Post implements PublicationWorkflowAwareInterface
     #[EntityTaxonomyField(multiple: true, label: 'Genres', group: 'metadata')]
     private Collection $genres;
 
+    /** @var Collection<int, PostTranslation> */
+    #[ORM\OneToMany(targetEntity: PostTranslation::class, mappedBy: 'object', cascade: ['persist', 'remove'])]
+    #[ApiProperty(readable: false, writable: false)]
+    private Collection $translations;
+
     public function __construct()
     {
         $this->tags = new ArrayCollection();
         $this->genres = new ArrayCollection();
+        $this->translations = new ArrayCollection();
     }
 
     public function getTitle(): ?string
@@ -181,5 +196,13 @@ class Post implements PublicationWorkflowAwareInterface
         $this->genres->removeElement($genre);
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, PostTranslation>
+     */
+    public function getTranslations(): Collection
+    {
+        return $this->translations;
     }
 }

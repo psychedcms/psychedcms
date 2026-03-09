@@ -20,6 +20,7 @@ import {
 } from 'react-admin';
 import { formatDistanceToNow } from 'date-fns';
 import { WorkflowButton } from './WorkflowButton.tsx';
+import { LocaleSwitcher } from './LocaleSwitcher.tsx';
 
 const statusChoices = [
   { id: 'draft', name: 'Draft' },
@@ -112,6 +113,9 @@ export function EditSidebar({ resource: resourceProp }: EditSidebarProps) {
           </Box>
         </CardContent>
       </Card>
+
+      {/* Language Switcher - self-contained, renders nothing if not applicable */}
+      <LocaleSwitcher />
 
       {/* Options - always show for workflow-aware content */}
       <Card variant="outlined">

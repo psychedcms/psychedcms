@@ -10,6 +10,10 @@ imports:
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    app_locales: '%env(default:app_locales_default:APP_LOCALES)%'
+    app_locales_default: 'en|fr'
+    app_default_locale: '%env(default:app_default_locale_default:APP_DEFAULT_LOCALE)%'
+    app_default_locale_default: 'en'
 
 services:
     # default configuration for services in *this* file
@@ -21,6 +25,12 @@ services:
     # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../src/'
+
+    # Locale Settings Controller
+    App\Controller\LocaleSettingsController:
+        arguments:
+            $appLocales: '%app_locales%'
+            $defaultLocale: '%app_default_locale%'
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

@@ -3,10 +3,18 @@ import { HydraAdmin, hydraDataProvider, ResourceGuesser } from '@api-platform/ad
 import type { Resource } from '@api-platform/api-doc-parser';
 
 import { PsychedSchemaProvider } from './providers/PsychedSchemaProvider.tsx';
+import { EditLocaleProvider } from './providers/EditLocaleContext.tsx';
+import { localeHttpClient } from './providers/localeHttpClient.ts';
+import { useLocaleSettings } from './hooks/useLocaleSettings.ts';
 import { PsychedLayout } from './components/layout/index.ts';
 import { PsychedCreateGuesser, PsychedEditGuesser, PsychedShowGuesser, PsychedListGuesser, TaxonomyList, GenreList, GenreCreate, GenreEdit, MediaList, MediaEdit } from './components/forms/index.ts';
 
 const entrypoint = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+
+const dataProvider = hydraDataProvider({
+  entrypoint,
+  httpClient: localeHttpClient,
+});
 
 /**
  * Custom component that renders resources with our custom Create/Edit guessers.
@@ -17,8 +25,6 @@ function PsychedAdmin() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const dataProvider = hydraDataProvider({ entrypoint });
-
     dataProvider
       .introspect()
       .then(({ data }) => {
@@ -36,11 +42,11 @@ function PsychedAdmin() {
   }
 
   if (resources.length === 0) {
-    return <HydraAdmin entrypoint={entrypoint} layout={PsychedLayout} />;
+    return <HydraAdmin entrypoint={entrypoint} dataProvider={dataProvider} layout={PsychedLayout} />;
   }
 
   return (
-    <HydraAdmin entrypoint={entrypoint} layout={PsychedLayout}>
+    <HydraAdmin entrypoint={entrypoint} dataProvider={dataProvider} layout={PsychedLayout}>
       {resources
         .filter((r) => !r.deprecated)
         .map((resource) => (
@@ -62,9 +68,17 @@ function PsychedAdmin() {
 }
 
 function App() {
+  const { defaultLocale, loading } = useLocaleSettings();
+
+  if (loading) {
+    return null;
+  }
+
   return (
     <PsychedSchemaProvider entrypoint={entrypoint}>
-      <PsychedAdmin />
+      <EditLocaleProvider defaultLocale={defaultLocale}>
+        <PsychedAdmin />
+      </EditLocaleProvider>
     </PsychedSchemaProvider>
   );
 }
