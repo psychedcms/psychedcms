@@ -6,12 +6,18 @@ import { useLocaleSettings } from '../../hooks/useLocaleSettings.ts';
 /**
  * Language toggle for the app bar.
  * Only switches the react-admin UI language (labels, buttons, etc.).
- * Does NOT change the content editing locale — that is managed
- * separately by the LocaleSwitcher in the edit form sidebar.
+ * Completely independent from the content editing locale.
+ * Ordered with default language first.
  */
 export function LocaleToggle() {
   const [raLocale, setRaLocale] = useLocaleState();
-  const { supportedLocales } = useLocaleSettings();
+  const { defaultLocale, supportedLocales } = useLocaleSettings();
+
+  // Default locale first, then the rest
+  const orderedLocales = [
+    defaultLocale,
+    ...supportedLocales.filter((l) => l !== defaultLocale),
+  ];
 
   const handleChange = (_: React.MouseEvent<HTMLElement>, newLocale: string | null) => {
     if (newLocale && newLocale !== raLocale) {
@@ -42,7 +48,7 @@ export function LocaleToggle() {
         },
       }}
     >
-      {supportedLocales.map((loc) => (
+      {orderedLocales.map((loc) => (
         <ToggleButton key={loc} value={loc}>
           {loc}
         </ToggleButton>

@@ -27,27 +27,14 @@ interface EditLocaleProviderProps {
 }
 
 /**
- * Get the user's preferred language.
- * Reads from react-admin's store (RaStore.locale), falling back to the app default.
+ * Provides the content editing locale.
+ * Always initializes to the app's default locale (from API settings).
+ * Completely independent from the UI language (topbar toggle).
  */
-function getPreferredLocale(defaultLocale: string): string {
-  try {
-    const raStored = localStorage.getItem('RaStore.locale');
-    if (raStored) {
-      // RA store values are JSON-encoded
-      return JSON.parse(raStored) as string;
-    }
-  } catch {
-    // ignore parse errors
-  }
-  return defaultLocale;
-}
-
 export function EditLocaleProvider({ defaultLocale = 'en', children }: EditLocaleProviderProps) {
   const [locale, setLocaleState] = useState(() => {
-    const initial = getPreferredLocale(defaultLocale);
-    currentEditLocale = initial;
-    return initial;
+    currentEditLocale = defaultLocale;
+    return defaultLocale;
   });
 
   const setLocale = useCallback((newLocale: string) => {

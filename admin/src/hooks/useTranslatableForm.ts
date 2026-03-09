@@ -4,6 +4,7 @@ import { useFormContext } from 'react-hook-form';
 
 import { useEditLocale } from '../providers/EditLocaleContext.tsx';
 import { usePsychedSchema } from './usePsychedSchema.ts';
+import { useLocaleSettings } from './useLocaleSettings.ts';
 
 const entrypoint = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
@@ -34,8 +35,9 @@ export function useTranslatableForm(resource: string) {
       .map(([name]) => name);
   }, [resourceSchema]);
 
+  const localeSettings = useLocaleSettings();
   const locales = resourceSchema?.contentType?.locales ?? [];
-  const defaultLocale = locales[0] ?? 'en';
+  const defaultLocale = localeSettings.defaultLocale;
 
   // Initialize: store default locale values, fetch other locales in background
   useEffect(() => {

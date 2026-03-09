@@ -78,10 +78,14 @@ function PsychedAdmin({ i18nProvider }: { i18nProvider: ReturnType<typeof create
 function App() {
   const { defaultLocale, loading } = useLocaleSettings();
 
-  // Create i18n provider with the user's preferred locale (from localStorage or API default)
+  // Create i18n provider with the user's preferred UI locale (from RA store or API default)
   const i18nProvider = useMemo(() => {
-    const stored = localStorage.getItem('psyched_edit_locale');
-    return createI18nProvider(stored ?? defaultLocale);
+    let uiLocale = defaultLocale;
+    try {
+      const stored = localStorage.getItem('RaStore.locale');
+      if (stored) uiLocale = JSON.parse(stored) as string;
+    } catch { /* ignore */ }
+    return createI18nProvider(uiLocale);
   }, [defaultLocale]);
 
   if (loading) {
