@@ -15,10 +15,13 @@ use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use PsychedCms\Core\Attribute\ContentType;
 use PsychedCms\Core\Attribute\Field\CollectionField;
+use PsychedCms\Core\Attribute\Field\DateField;
 use PsychedCms\Core\Attribute\Field\HtmlField;
 use PsychedCms\Core\Attribute\Field\RelationField;
 use PsychedCms\Core\Attribute\Field\TextareaField;
 use PsychedCms\Core\Attribute\Field\TextField;
+use PsychedCms\Core\Attribute\Field\UrlField;
+use PsychedCms\Geolocation\Attribute\GeolocationField;
 use PsychedCms\Core\Content\ContentTrait;
 use PsychedCms\Core\Content\TranslatableInterface;
 use PsychedCms\Core\Content\TranslatableTrait;
@@ -98,6 +101,18 @@ class Post implements PublicationWorkflowAwareInterface, TranslatableInterface
         max: 10,
     )]
     private ?array $socialLinks = null;
+
+    #[ORM\Column(length: 500, nullable: true)]
+    #[UrlField(label: 'External URL', group: 'content', placeholder: 'https://example.com')]
+    private ?string $externalUrl = null;
+
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    #[DateField(mode: 'datetime', label: 'Event Date & Time', group: 'metadata')]
+    private ?\DateTimeImmutable $eventDate = null;
+
+    #[ORM\Column(type: 'json', nullable: true)]
+    #[GeolocationField(label: 'Location', group: 'metadata')]
+    private ?array $location = null;
 
     /** @var Collection<int, PostTranslation> */
     #[ORM\OneToMany(targetEntity: PostTranslation::class, mappedBy: 'object', cascade: ['persist', 'remove'])]
@@ -252,6 +267,42 @@ class Post implements PublicationWorkflowAwareInterface, TranslatableInterface
     public function setSocialLinks(?array $socialLinks): static
     {
         $this->socialLinks = $socialLinks;
+
+        return $this;
+    }
+
+    public function getExternalUrl(): ?string
+    {
+        return $this->externalUrl;
+    }
+
+    public function setExternalUrl(?string $externalUrl): static
+    {
+        $this->externalUrl = $externalUrl;
+
+        return $this;
+    }
+
+    public function getEventDate(): ?\DateTimeImmutable
+    {
+        return $this->eventDate;
+    }
+
+    public function setEventDate(?\DateTimeImmutable $eventDate): static
+    {
+        $this->eventDate = $eventDate;
+
+        return $this;
+    }
+
+    public function getLocation(): ?array
+    {
+        return $this->location;
+    }
+
+    public function setLocation(?array $location): static
+    {
+        $this->location = $location;
 
         return $this;
     }

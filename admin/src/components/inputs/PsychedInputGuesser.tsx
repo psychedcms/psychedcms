@@ -1,7 +1,6 @@
 import {
   useResourceContext,
   TextInput,
-  DateTimeInput,
   SelectInput,
   SelectArrayInput,
   AutocompleteInput,
@@ -25,6 +24,7 @@ import { FileListInput } from './FileListInput.tsx';
 import { CollectionInput } from './CollectionInput.tsx';
 import { RelationInput } from './RelationInput.tsx';
 import { GeolocationInput } from './GeolocationInput.tsx';
+import { MuiDateTimeInput } from './MuiDateTimeInput.tsx';
 
 interface PsychedInputGuesserProps extends Omit<InputProps, 'source'> {
   source: string;
@@ -81,10 +81,10 @@ export function PsychedInputGuesser({
 
   if (type === 'date' && fieldMetadata.mode === 'datetime') {
     return (
-      <DateTimeInput
+      <MuiDateTimeInput
         source={source}
-        label={baseProps.label as string | undefined}
-        helperText={baseProps.helperText as string | undefined}
+        label={typeof label === 'string' ? label : undefined}
+        helperText={typeof info === 'string' ? info : undefined}
         isRequired={required ?? undefined}
         readOnly={readonly ?? undefined}
       />

@@ -2,6 +2,7 @@ import { Layout, useLocaleState, type LayoutProps } from 'react-admin';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import 'dayjs/locale/fr';
+import 'dayjs/locale/en';
 
 import { PsychedMenu } from './PsychedMenu.tsx';
 import { PsychedAppBar } from './PsychedAppBar.tsx';

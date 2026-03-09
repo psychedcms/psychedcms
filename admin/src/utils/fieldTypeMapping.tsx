@@ -2,7 +2,6 @@ import type { ComponentType, ReactElement } from 'react';
 import {
   TextInput,
   BooleanInput,
-  DateInput,
   NumberInput,
   SelectInput,
   AutocompleteInput,
@@ -24,6 +23,8 @@ import { FileListInput } from '../components/inputs/FileListInput.tsx';
 import { CollectionInput } from '../components/inputs/CollectionInput.tsx';
 import { RelationInput } from '../components/inputs/RelationInput.tsx';
 import { GeolocationInput } from '../components/inputs/GeolocationInput.tsx';
+import { MuiDateInput } from '../components/inputs/MuiDateInput.tsx';
+import { MuiDateTimeInput } from '../components/inputs/MuiDateTimeInput.tsx';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyComponent = ComponentType<any>;
@@ -63,7 +64,7 @@ const fieldTypeMappings: Record<FieldType, FieldTypeConfig> = {
     component: BooleanInput as AnyComponent,
   },
   date: {
-    component: DateInput as AnyComponent,
+    component: MuiDateInput as AnyComponent,
   },
   email: {
     component: TextInput as AnyComponent,

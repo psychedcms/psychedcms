@@ -35,6 +35,7 @@ const customEnMessages = {
       published_at: 'Published at',
       depublished_at: 'Depublished at',
       author: 'Author',
+      search_address: 'Search address',
     },
     metadata: {
       created: 'Created:',
@@ -109,6 +110,7 @@ const customFrMessages = {
       published_at: 'Publié le',
       depublished_at: 'Dépublié le',
       author: 'Auteur',
+      search_address: 'Rechercher une adresse',
     },
     metadata: {
       created: 'Créé :',
