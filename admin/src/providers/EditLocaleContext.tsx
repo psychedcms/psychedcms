@@ -21,25 +21,37 @@ export function getCurrentEditLocale(): string {
   return currentEditLocale;
 }
 
-const LOCALE_STORAGE_KEY = 'psyched_edit_locale';
-
 interface EditLocaleProviderProps {
   defaultLocale?: string;
   children: ReactNode;
 }
 
+/**
+ * Get the user's preferred language.
+ * Reads from react-admin's store (RaStore.locale), falling back to the app default.
+ */
+function getPreferredLocale(defaultLocale: string): string {
+  try {
+    const raStored = localStorage.getItem('RaStore.locale');
+    if (raStored) {
+      // RA store values are JSON-encoded
+      return JSON.parse(raStored) as string;
+    }
+  } catch {
+    // ignore parse errors
+  }
+  return defaultLocale;
+}
+
 export function EditLocaleProvider({ defaultLocale = 'en', children }: EditLocaleProviderProps) {
   const [locale, setLocaleState] = useState(() => {
-    // Check localStorage for a previously saved preference
-    const stored = localStorage.getItem(LOCALE_STORAGE_KEY);
-    const initial = stored ?? defaultLocale;
+    const initial = getPreferredLocale(defaultLocale);
     currentEditLocale = initial;
     return initial;
   });
 
   const setLocale = useCallback((newLocale: string) => {
     currentEditLocale = newLocale;
-    localStorage.setItem(LOCALE_STORAGE_KEY, newLocale);
     setLocaleState(newLocale);
   }, []);
 

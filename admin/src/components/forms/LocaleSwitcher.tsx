@@ -4,19 +4,19 @@ import { useResourceContext } from 'react-admin';
 
 import { useEditLocale } from '../../providers/EditLocaleContext.tsx';
 import { usePsychedSchema } from '../../hooks/usePsychedSchema.ts';
+import { useLocaleSettings } from '../../hooks/useLocaleSettings.ts';
 
 /**
  * Locale switcher for the edit sidebar.
- * Shows available locales from the content type schema.
- * Only renders when the content type has translatable fields and multiple locales.
- *
- * Switching locale swaps translatable field values in the form (via useTranslatableForm hook)
- * without refetching or remounting — preserving all in-progress edits.
+ * Shows available locales from the content type schema, ordered with
+ * the default language first. Only renders when the content type has
+ * translatable fields and multiple locales.
  */
 export function LocaleSwitcher() {
   const resourceFromContext = useResourceContext();
   const resourceSchema = usePsychedSchema(resourceFromContext ?? '');
   const { locale, setLocale } = useEditLocale();
+  const { defaultLocale } = useLocaleSettings();
 
   const locales = resourceSchema?.contentType?.locales;
   if (!locales || locales.length <= 1) {
@@ -30,6 +30,12 @@ export function LocaleSwitcher() {
   if (!hasTranslatableFields) {
     return null;
   }
+
+  // Order: default locale first, then the rest
+  const orderedLocales = [
+    defaultLocale,
+    ...locales.filter((l) => l !== defaultLocale),
+  ].filter((l) => locales.includes(l));
 
   const handleLocaleChange = (_: React.MouseEvent<HTMLElement>, newLocale: string | null) => {
     if (newLocale && newLocale !== locale) {
@@ -53,7 +59,7 @@ export function LocaleSwitcher() {
           size="small"
           fullWidth
         >
-          {locales.map((loc) => (
+          {orderedLocales.map((loc) => (
             <ToggleButton key={loc} value={loc} sx={{ textTransform: 'uppercase' }}>
               {loc}
             </ToggleButton>
