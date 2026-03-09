@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c88d9620f0f2848a9b62c9fb7dc30db9",
+    "content-hash": "466761b51ed5a69324118070e9c9b590",
     "packages": [
         {
             "name": "api-platform/core",
@@ -2722,7 +2722,7 @@
             "dist": {
                 "type": "path",
                 "url": "../packages/psychedcms-core",
-                "reference": "52a4518ebafc09eddf3802f5265e3da07ff8e817"
+                "reference": "a4dec60dd65ee19c7d04ebf1d0e466ced7f0fc45"
             },
             "require": {
                 "api-platform/core": "^4.0",
@@ -2764,7 +2764,7 @@
             "dist": {
                 "type": "path",
                 "url": "../packages/psychedcms-geolocation",
-                "reference": "2fdd5b16be5d4989240ff205ec6a958bb21fd58f"
+                "reference": "f62032bee3fee8c6761fc3c86f6cf3b937f637be"
             },
             "require": {
                 "php": ">=8.2",
@@ -2878,6 +2878,51 @@
                 "proprietary"
             ],
             "description": "Taxonomy and categorization system for PsychedCMS",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "psychedcms/psychedcms-translatable",
+            "version": "dev-master",
+            "dist": {
+                "type": "path",
+                "url": "../packages/psychedcms-translatable",
+                "reference": "127cf7314457e9d00b6b65101c22a7a4ef5b2901"
+            },
+            "require": {
+                "gedmo/doctrine-extensions": "^3.0",
+                "php": ">=8.2",
+                "psychedcms/psychedcms-core": "^1.0 || @dev",
+                "stof/doctrine-extensions-bundle": "^1.12",
+                "symfony/config": "^7.4",
+                "symfony/dependency-injection": "^7.4",
+                "symfony/http-kernel": "^7.4"
+            },
+            "require-dev": {
+                "api-platform/core": "^4.0",
+                "doctrine/orm": "^3.0",
+                "phpunit/phpunit": "^10.0"
+            },
+            "suggest": {
+                "api-platform/core": "Required for translation completeness filtering on API collections"
+            },
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-4": {
+                    "PsychedCms\\Translatable\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "PsychedCms\\Translatable\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Translatable content support for PsychedCMS - Locale management and translation completeness filtering",
             "transport-options": {
                 "symlink": true,
                 "relative": true
@@ -9393,6 +9438,7 @@
         "psychedcms/psychedcms-geolocation": 20,
         "psychedcms/psychedcms-media": 20,
         "psychedcms/psychedcms-taxonomy": 20,
+        "psychedcms/psychedcms-translatable": 20,
         "psychedcms/psychedcms-workflow": 20
     },
     "prefer-stable": true,
