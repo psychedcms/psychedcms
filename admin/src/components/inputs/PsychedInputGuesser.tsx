@@ -22,6 +22,7 @@ import { FileInput } from './FileInput.tsx';
 import { ImageListInput } from './ImageListInput.tsx';
 import { FileListInput } from './FileListInput.tsx';
 import { CollectionInput } from './CollectionInput.tsx';
+import { RelationInput } from './RelationInput.tsx';
 
 interface PsychedInputGuesserProps extends Omit<InputProps, 'source'> {
   source: string;
@@ -112,6 +113,24 @@ export function PsychedInputGuesser({
         source={source}
         reference={source}
         multiple={fieldMetadata.multiple ?? false}
+        label={typeof label === 'string' ? label : undefined}
+        helperText={typeof info === 'string' ? info : undefined}
+        isRequired={required ?? undefined}
+      />
+    );
+  }
+
+  if (type === 'relation') {
+    return (
+      <RelationInput
+        source={source}
+        reference={fieldMetadata.reference ?? source}
+        multiple={fieldMetadata.multiple ?? false}
+        displayField={fieldMetadata.displayField ?? 'name'}
+        searchable={fieldMetadata.autocompleteSearch ?? true}
+        allowCreate={fieldMetadata.allowCreate ?? false}
+        order={fieldMetadata.order}
+        filter={fieldMetadata.filter}
         label={typeof label === 'string' ? label : undefined}
         helperText={typeof info === 'string' ? info : undefined}
         isRequired={required ?? undefined}

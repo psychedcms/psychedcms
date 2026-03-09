@@ -37,6 +37,7 @@ export type FieldType =
   | 'hidden'
   | 'taxonomy'
   | 'entity_taxonomy'
+  | 'relation'
   | 'image'
   | 'file'
   | 'imagelist'
@@ -82,9 +83,13 @@ export interface FieldMetadata {
   allowCreate?: boolean;
   min?: number;
   max?: number;
-  // EntityTaxonomyField extras
+  // EntityTaxonomyField / RelationField extras
   order?: string;
   filter?: string;
+  // RelationField extras
+  reference?: string;
+  displayField?: string;
+  autocompleteSearch?: boolean;
   // ImageField / FileField extras
   maxSize?: number;
   allowedTypes?: string[];

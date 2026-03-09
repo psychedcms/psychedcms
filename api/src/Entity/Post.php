@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
@@ -15,6 +16,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use PsychedCms\Core\Attribute\ContentType;
 use PsychedCms\Core\Attribute\Field\CollectionField;
 use PsychedCms\Core\Attribute\Field\HtmlField;
+use PsychedCms\Core\Attribute\Field\RelationField;
 use PsychedCms\Core\Attribute\Field\TextareaField;
 use PsychedCms\Core\Attribute\Field\TextField;
 use PsychedCms\Core\Content\ContentTrait;
@@ -35,6 +37,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Index(columns: ['status'], name: 'idx_posts_status')]
 #[ORM\Index(columns: ['author_id'], name: 'idx_posts_author_id')]
 #[ApiResource(mercure: true)]
+#[ApiFilter(SearchFilter::class, properties: ['title' => 'partial'])]
 #[ApiFilter(TaxonomySlugFilter::class, properties: ['tags'])]
 #[ContentType(icon: 'Article', locales: ['en', 'fr'])]
 #[Gedmo\TranslationEntity(class: PostTranslation::class)]
@@ -79,6 +82,11 @@ class Post implements PublicationWorkflowAwareInterface, TranslatableInterface
     #[EntityTaxonomyField(multiple: true, label: 'Genres', group: 'metadata')]
     private Collection $genres;
 
+    #[ORM\ManyToMany(targetEntity: Post::class)]
+    #[ORM\JoinTable(name: 'post_related_posts')]
+    #[RelationField(reference: 'posts', multiple: true, displayField: 'title', label: 'Related Posts', group: 'metadata', max: 5)]
+    private Collection $relatedPosts;
+
     #[ORM\Column(type: 'json', nullable: true)]
     #[CollectionField(
         label: 'Social Links',
@@ -100,6 +108,7 @@ class Post implements PublicationWorkflowAwareInterface, TranslatableInterface
     {
         $this->tags = new ArrayCollection();
         $this->genres = new ArrayCollection();
+        $this->relatedPosts = new ArrayCollection();
         $this->translations = new ArrayCollection();
     }
 
@@ -207,6 +216,30 @@ class Post implements PublicationWorkflowAwareInterface, TranslatableInterface
     public function removeGenre(Genre $genre): static
     {
         $this->genres->removeElement($genre);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Post>
+     */
+    public function getRelatedPosts(): Collection
+    {
+        return $this->relatedPosts;
+    }
+
+    public function addRelatedPost(Post $post): static
+    {
+        if (!$this->relatedPosts->contains($post)) {
+            $this->relatedPosts->add($post);
+        }
+
+        return $this;
+    }
+
+    public function removeRelatedPost(Post $post): static
+    {
+        $this->relatedPosts->removeElement($post);
 
         return $this;
     }
