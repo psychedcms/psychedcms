@@ -15,9 +15,9 @@
   "dependencies": {
     "@api-platform/admin": "^4.0.8",
     "@mui/x-date-pickers": "^8.26.0",
-    "@psychedcms/admin-core": "file:../packages/admin-core",
-    "@psychedcms/admin-geolocation": "file:../packages/admin-geolocation",
-    "@psychedcms/admin-translatable": "file:../packages/admin-translatable",
+    "@psychedcms/admin-core": "file:../packages/psychedcms-admin-core",
+    "@psychedcms/admin-geolocation": "file:../packages/psychedcms-admin-geolocation",
+    "@psychedcms/admin-translatable": "file:../packages/psychedcms-admin-translatable",
     "@tiptap/extension-link": "^3.17.1",
     "@tiptap/pm": "^3.17.1",
     "@tiptap/react": "^3.17.1",

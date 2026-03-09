@@ -19,8 +19,8 @@
     /* Workspace package resolution */
     "baseUrl": ".",
     "paths": {
-      "@psychedcms/admin-core": ["../packages/admin-core/src/index.ts"],
-      "@psychedcms/admin-translatable": ["../packages/admin-translatable/src/index.ts"]
+      "@psychedcms/admin-core": ["../packages/psychedcms-admin-core/src/index.ts"],
+      "@psychedcms/admin-translatable": ["../packages/psychedcms-admin-translatable/src/index.ts"]
     },
     "typeRoots": ["./node_modules/@types", "./node_modules"],
 
@@ -32,5 +32,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src", "../packages/admin-core/src", "../packages/admin-translatable/src"]
+  "include": ["src", "../packages/psychedcms-admin-core/src", "../packages/psychedcms-admin-translatable/src"]
 }

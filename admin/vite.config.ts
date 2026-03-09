@@ -9,8 +9,8 @@ export default defineConfig({
   base: '/admin/',
   resolve: {
     alias: {
-      '@psychedcms/admin-core': path.resolve(__dirname, '../packages/admin-core/src/index.ts'),
-      '@psychedcms/admin-translatable': path.resolve(__dirname, '../packages/admin-translatable/src/index.ts'),
+      '@psychedcms/admin-core': path.resolve(__dirname, '../packages/psychedcms-admin-core/src/index.ts'),
+      '@psychedcms/admin-translatable': path.resolve(__dirname, '../packages/psychedcms-admin-translatable/src/index.ts'),
     },
     // Ensure workspace packages resolve their dependencies from admin's node_modules
     dedupe: ['react', 'react-dom', 'react-admin', '@mui/material', '@mui/icons-material', 'react-router-dom', 'react-hook-form'],
