@@ -3,6 +3,7 @@ import type { MutableRefObject } from 'react';
 import {
   SimpleForm,
   useResourceContext,
+  useTranslate,
 } from 'react-admin';
 import { Box, Card, Tab, Tabs } from '@mui/material';
 
@@ -56,6 +57,7 @@ function ContentFormLayout({
   groupedFields: Map<string, string[]>;
   translatableSaveRef?: MutableRefObject<TranslatableSaveHandle | null>;
 }) {
+  const translate = useTranslate();
   const [activeTab, setActiveTab] = useState(0);
   const hasTabs = groupOrder.length > 1;
 
@@ -81,9 +83,12 @@ function ContentFormLayout({
               onChange={(_, v) => setActiveTab(v)}
               sx={{ mb: 2, borderBottom: 1, borderColor: 'divider' }}
             >
-              {groupOrder.map((group) => (
-                <Tab key={group} label={humanizeGroupName(group)} />
-              ))}
+              {groupOrder.map((group) => {
+                const translationKey = `psyched.groups.${group}`;
+                const translated = translate(translationKey);
+                const tabLabel = translated !== translationKey ? translated : humanizeGroupName(group);
+                return <Tab key={group} label={tabLabel} />;
+              })}
             </Tabs>
           )}
 
