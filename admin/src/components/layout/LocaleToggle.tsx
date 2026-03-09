@@ -2,21 +2,20 @@ import { useLocaleState } from 'react-admin';
 import { ToggleButton, ToggleButtonGroup } from '@mui/material';
 
 import { useLocaleSettings } from '../../hooks/useLocaleSettings.ts';
-import { useEditLocale } from '../../providers/EditLocaleContext.tsx';
 
 /**
  * Language toggle for the app bar.
- * Switches both react-admin UI language and the editing locale simultaneously.
+ * Only switches the react-admin UI language (labels, buttons, etc.).
+ * Does NOT change the content editing locale — that is managed
+ * separately by the LocaleSwitcher in the edit form sidebar.
  */
 export function LocaleToggle() {
   const [raLocale, setRaLocale] = useLocaleState();
-  const { setLocale: setEditLocale } = useEditLocale();
   const { supportedLocales } = useLocaleSettings();
 
   const handleChange = (_: React.MouseEvent<HTMLElement>, newLocale: string | null) => {
     if (newLocale && newLocale !== raLocale) {
       setRaLocale(newLocale);
-      setEditLocale(newLocale);
     }
   };
 

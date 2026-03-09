@@ -12,27 +12,24 @@ import {
 import TranslateIcon from '@mui/icons-material/Translate';
 import SaveIcon from '@mui/icons-material/Save';
 
-import { useEditLocale } from '../../providers/EditLocaleContext.tsx';
 import { useLocaleSettings } from '../../hooks/useLocaleSettings.ts';
 
 /**
- * User Preferences page — allows the user to set their preferred locale.
- * Changes both the admin UI language and the editing locale.
+ * User Preferences page — allows the user to set their preferred UI language.
+ * This only affects admin interface labels, not the content editing locale.
  */
 export function PreferencesSettings() {
-  const { locale, setLocale } = useEditLocale();
-  const [, setRaLocale] = useLocaleState();
+  const [raLocale, setRaLocale] = useLocaleState();
   const { supportedLocales } = useLocaleSettings();
   const notify = useNotify();
-  const [selectedLocale, setSelectedLocale] = useState(locale);
+  const [selectedLocale, setSelectedLocale] = useState(raLocale);
 
   const handleSave = () => {
-    setLocale(selectedLocale);
     setRaLocale(selectedLocale);
     notify('Preferences saved', { type: 'success' });
   };
 
-  const hasChanges = selectedLocale !== locale;
+  const hasChanges = selectedLocale !== raLocale;
 
   return (
     <Box sx={{ maxWidth: 800, mt: 2 }}>
@@ -48,8 +45,8 @@ export function PreferencesSettings() {
           </Box>
 
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Choose your preferred language. This sets both the admin interface
-            language and the default locale for editing translatable content.
+            Choose your preferred language for the admin interface.
+            Content editing language is managed separately in each edit form.
           </Typography>
 
           <ToggleButtonGroup
