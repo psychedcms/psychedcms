@@ -78,7 +78,11 @@ function SubFieldInput({
   value: unknown;
   onChange: (value: unknown) => void;
 }) {
-  const label = fieldKey.charAt(0).toUpperCase() + fieldKey.slice(1).replace(/_/g, ' ');
+  const translate = useTranslate();
+  const humanized = fieldKey.charAt(0).toUpperCase() + fieldKey.slice(1).replace(/_/g, ' ');
+  const translationKey = `psyched.collection_fields.${fieldKey}`;
+  const translated = translate(translationKey);
+  const label = translated !== translationKey ? translated : humanized;
 
   switch (fieldDef.type) {
     case 'select': {

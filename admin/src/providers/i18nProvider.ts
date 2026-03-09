@@ -44,6 +44,10 @@ const customEnMessages = {
       author: 'Author',
       search_address: 'Search address',
     },
+    collection_fields: {
+      platform: 'Platform',
+      url: 'URL',
+    },
     metadata: {
       created: 'Created:',
       modified: 'Modified:',
@@ -148,6 +152,10 @@ const customFrMessages = {
       depublished_at: 'Dépublié le',
       author: 'Auteur',
       search_address: 'Rechercher une adresse',
+    },
+    collection_fields: {
+      platform: 'Plateforme',
+      url: 'URL',
     },
     metadata: {
       created: 'Créé :',
