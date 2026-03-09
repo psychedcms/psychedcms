@@ -5,11 +5,11 @@ import {
   Card,
   CardContent,
   Typography,
-  Chip,
-  Stack,
-  ToggleButton,
-  ToggleButtonGroup,
   Button,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material';
 import LanguageIcon from '@mui/icons-material/Language';
 import SaveIcon from '@mui/icons-material/Save';
@@ -33,8 +33,8 @@ async function saveDefaultLocale(defaultLocale: string): Promise<void> {
 
 /**
  * Global Settings page — manage the default locale.
- * Supported locales are configured via APP_LOCALES env var (read-only here).
- * Default locale is stored in the database and editable.
+ * Supported locales are configured via APP_LOCALES env var.
+ * Default locale is stored in the database and editable via dropdown.
  */
 export function GlobalSettings() {
   const { defaultLocale, supportedLocales, reload } = useLocaleSettings();
@@ -68,56 +68,34 @@ export function GlobalSettings() {
         <CardContent>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
             <LanguageIcon />
-            <Typography variant="h6">Locales</Typography>
+            <Typography variant="h6">Language</Typography>
           </Box>
 
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-              Available Languages
-            </Typography>
-            <Stack direction="row" spacing={1}>
-              {supportedLocales.map((loc) => (
-                <Chip
-                  key={loc}
-                  label={loc.toUpperCase()}
-                  variant={loc === selectedDefault ? 'filled' : 'outlined'}
-                  color={loc === selectedDefault ? 'primary' : 'default'}
-                />
-              ))}
-            </Stack>
-            <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-              Configured via <code>APP_LOCALES</code> environment variable
-            </Typography>
-          </Box>
-
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-              Default Language
-            </Typography>
-            <ToggleButtonGroup
+          <FormControl sx={{ minWidth: 200, mb: 3 }}>
+            <InputLabel>Default Language</InputLabel>
+            <Select
               value={selectedDefault}
-              exclusive
-              onChange={(_, value) => {
-                if (value) setSelectedDefault(value);
-              }}
-              size="small"
+              label="Default Language"
+              onChange={(e) => setSelectedDefault(e.target.value)}
             >
               {supportedLocales.map((loc) => (
-                <ToggleButton key={loc} value={loc} sx={{ textTransform: 'uppercase', px: 2 }}>
-                  {loc}
-                </ToggleButton>
+                <MenuItem key={loc} value={loc}>
+                  {loc.toUpperCase()}
+                </MenuItem>
               ))}
-            </ToggleButtonGroup>
-          </Box>
+            </Select>
+          </FormControl>
 
-          <Button
-            variant="contained"
-            startIcon={<SaveIcon />}
-            onClick={handleSave}
-            disabled={!hasChanges || saving}
-          >
-            {saving ? 'Saving...' : 'Save'}
-          </Button>
+          <Box>
+            <Button
+              variant="contained"
+              startIcon={<SaveIcon />}
+              onClick={handleSave}
+              disabled={!hasChanges || saving}
+            >
+              {saving ? 'Saving...' : 'Save'}
+            </Button>
+          </Box>
         </CardContent>
       </Card>
     </Box>
