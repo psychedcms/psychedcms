@@ -24,6 +24,7 @@ import { ImageListInput } from './ImageListInput.tsx';
 import { FileListInput } from './FileListInput.tsx';
 import { CollectionInput } from './CollectionInput.tsx';
 import { RelationInput } from './RelationInput.tsx';
+import { GeolocationInput } from './GeolocationInput.tsx';
 
 interface PsychedInputGuesserProps extends Omit<InputProps, 'source'> {
   source: string;
@@ -79,7 +80,15 @@ export function PsychedInputGuesser({
   }
 
   if (type === 'date' && fieldMetadata.mode === 'datetime') {
-    return <DateTimeInput {...baseProps} />;
+    return (
+      <DateTimeInput
+        source={source}
+        label={baseProps.label as string | undefined}
+        helperText={baseProps.helperText as string | undefined}
+        isRequired={required ?? undefined}
+        readOnly={readonly ?? undefined}
+      />
+    );
   }
 
   if (type === 'select') {
@@ -202,6 +211,21 @@ export function PsychedInputGuesser({
         min={fieldMetadata.min}
         max={fieldMetadata.max}
         sortable={fieldMetadata.sortable}
+      />
+    );
+  }
+
+  if (type === 'geolocation') {
+    return (
+      <GeolocationInput
+        source={source}
+        provider={fieldMetadata.provider}
+        defaultZoom={fieldMetadata.defaultZoom}
+        defaultLat={fieldMetadata.defaultLat}
+        defaultLng={fieldMetadata.defaultLng}
+        label={typeof label === 'string' ? label : undefined}
+        helperText={typeof info === 'string' ? info : undefined}
+        isRequired={required ?? undefined}
       />
     );
   }
