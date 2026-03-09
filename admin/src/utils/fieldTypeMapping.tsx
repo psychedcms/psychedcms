@@ -21,6 +21,7 @@ import { ImageInput } from '../components/inputs/ImageInput.tsx';
 import { FileInput } from '../components/inputs/FileInput.tsx';
 import { ImageListInput } from '../components/inputs/ImageListInput.tsx';
 import { FileListInput } from '../components/inputs/FileListInput.tsx';
+import { CollectionInput } from '../components/inputs/CollectionInput.tsx';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyComponent = ComponentType<any>;
@@ -91,6 +92,9 @@ const fieldTypeMappings: Record<FieldType, FieldTypeConfig> = {
   },
   filelist: {
     component: FileListInput as AnyComponent,
+  },
+  collection: {
+    component: CollectionInput as AnyComponent,
   },
   hidden: {
     component: (() => null) as AnyComponent,

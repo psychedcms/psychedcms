@@ -41,6 +41,7 @@ export type FieldType =
   | 'file'
   | 'imagelist'
   | 'filelist'
+  | 'collection'
   | 'field';
 
 /**
@@ -89,6 +90,8 @@ export interface FieldMetadata {
   allowedTypes?: string[];
   thumbnailWidth?: number;
   thumbnailHeight?: number;
+  // CollectionField extras
+  schema?: Record<string, string | { type: string; values?: string[] | Record<string, string> }>;
 }
 
 /**

@@ -13,6 +13,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use PsychedCms\Core\Attribute\ContentType;
+use PsychedCms\Core\Attribute\Field\CollectionField;
 use PsychedCms\Core\Attribute\Field\HtmlField;
 use PsychedCms\Core\Attribute\Field\TextareaField;
 use PsychedCms\Core\Attribute\Field\TextField;
@@ -77,6 +78,18 @@ class Post implements PublicationWorkflowAwareInterface, TranslatableInterface
     #[ORM\JoinTable(name: 'post_genres')]
     #[EntityTaxonomyField(multiple: true, label: 'Genres', group: 'metadata')]
     private Collection $genres;
+
+    #[ORM\Column(type: 'json', nullable: true)]
+    #[CollectionField(
+        label: 'Social Links',
+        group: 'content',
+        schema: [
+            'platform' => ['type' => 'select', 'values' => ['spotify', 'apple_music', 'bandcamp', 'youtube', 'instagram', 'facebook', 'twitter']],
+            'url' => 'text',
+        ],
+        max: 10,
+    )]
+    private ?array $socialLinks = null;
 
     /** @var Collection<int, PostTranslation> */
     #[ORM\OneToMany(targetEntity: PostTranslation::class, mappedBy: 'object', cascade: ['persist', 'remove'])]
@@ -194,6 +207,18 @@ class Post implements PublicationWorkflowAwareInterface, TranslatableInterface
     public function removeGenre(Genre $genre): static
     {
         $this->genres->removeElement($genre);
+
+        return $this;
+    }
+
+    public function getSocialLinks(): ?array
+    {
+        return $this->socialLinks;
+    }
+
+    public function setSocialLinks(?array $socialLinks): static
+    {
+        $this->socialLinks = $socialLinks;
 
         return $this;
     }

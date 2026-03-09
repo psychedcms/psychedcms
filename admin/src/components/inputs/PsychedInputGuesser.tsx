@@ -21,6 +21,7 @@ import { ImageInput } from './ImageInput.tsx';
 import { FileInput } from './FileInput.tsx';
 import { ImageListInput } from './ImageListInput.tsx';
 import { FileListInput } from './FileListInput.tsx';
+import { CollectionInput } from './CollectionInput.tsx';
 
 interface PsychedInputGuesserProps extends Omit<InputProps, 'source'> {
   source: string;
@@ -162,6 +163,21 @@ export function PsychedInputGuesser({
         isRequired={required ?? undefined}
         min={fieldMetadata.min}
         max={fieldMetadata.max}
+      />
+    );
+  }
+
+  if (type === 'collection') {
+    return (
+      <CollectionInput
+        source={source}
+        label={typeof label === 'string' ? label : undefined}
+        helperText={typeof info === 'string' ? info : undefined}
+        isRequired={required ?? undefined}
+        schema={fieldMetadata.schema}
+        min={fieldMetadata.min}
+        max={fieldMetadata.max}
+        sortable={fieldMetadata.sortable}
       />
     );
   }
