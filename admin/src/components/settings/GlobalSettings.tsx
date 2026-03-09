@@ -9,79 +9,48 @@ import {
   Stack,
   ToggleButton,
   ToggleButtonGroup,
-  TextField,
   Button,
-  IconButton,
 } from '@mui/material';
 import LanguageIcon from '@mui/icons-material/Language';
 import SaveIcon from '@mui/icons-material/Save';
-import AddIcon from '@mui/icons-material/Add';
-import CloseIcon from '@mui/icons-material/Close';
 
-import { useLocaleSettings, type LocaleSettings } from '../../hooks/useLocaleSettings.ts';
+import { useLocaleSettings } from '../../hooks/useLocaleSettings.ts';
 
 const entrypoint = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
-async function saveLocaleSettings(settings: LocaleSettings): Promise<LocaleSettings> {
+async function saveDefaultLocale(defaultLocale: string): Promise<void> {
   const response = await fetch(`${entrypoint}/locale-settings`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(settings),
+    body: JSON.stringify({ defaultLocale }),
   });
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({ error: 'Save failed' }));
     throw new Error(error.error ?? 'Save failed');
   }
-
-  return response.json();
 }
 
 /**
- * Global Settings page — manage app-wide locale configuration.
- * Default locale and supported locales are stored in the database.
+ * Global Settings page — manage the default locale.
+ * Supported locales are configured via APP_LOCALES env var (read-only here).
+ * Default locale is stored in the database and editable.
  */
 export function GlobalSettings() {
   const { defaultLocale, supportedLocales, reload } = useLocaleSettings();
   const notify = useNotify();
 
   const [selectedDefault, setSelectedDefault] = useState(defaultLocale);
-  const [locales, setLocales] = useState<string[]>(supportedLocales);
-  const [newLocale, setNewLocale] = useState('');
   const [saving, setSaving] = useState(false);
 
-  const hasChanges =
-    selectedDefault !== defaultLocale ||
-    JSON.stringify(locales) !== JSON.stringify(supportedLocales);
-
-  const handleAddLocale = () => {
-    const code = newLocale.trim().toLowerCase();
-    if (code && code.length >= 2 && code.length <= 5 && !locales.includes(code)) {
-      setLocales([...locales, code]);
-      setNewLocale('');
-    }
-  };
-
-  const handleRemoveLocale = (loc: string) => {
-    const updated = locales.filter((l) => l !== loc);
-    if (updated.length === 0) return;
-    setLocales(updated);
-    if (selectedDefault === loc) {
-      setSelectedDefault(updated[0]);
-    }
-  };
+  const hasChanges = selectedDefault !== defaultLocale;
 
   const handleSave = async () => {
     setSaving(true);
     try {
-      const result = await saveLocaleSettings({
-        defaultLocale: selectedDefault,
-        supportedLocales: locales,
-      });
-      setSelectedDefault(result.defaultLocale);
-      setLocales(result.supportedLocales);
+      await saveDefaultLocale(selectedDefault);
       reload();
-      notify('Locale settings saved', { type: 'success' });
+      notify('Default locale saved', { type: 'success' });
     } catch (err) {
       notify(err instanceof Error ? err.message : 'Failed to save', { type: 'error' });
     } finally {
@@ -104,43 +73,26 @@ export function GlobalSettings() {
 
           <Box sx={{ mb: 3 }}>
             <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-              Supported Locales
+              Available Languages
             </Typography>
-            <Stack direction="row" spacing={1} sx={{ mb: 1, flexWrap: 'wrap', gap: 1 }}>
-              {locales.map((loc) => (
+            <Stack direction="row" spacing={1}>
+              {supportedLocales.map((loc) => (
                 <Chip
                   key={loc}
                   label={loc.toUpperCase()}
                   variant={loc === selectedDefault ? 'filled' : 'outlined'}
                   color={loc === selectedDefault ? 'primary' : 'default'}
-                  onDelete={locales.length > 1 ? () => handleRemoveLocale(loc) : undefined}
-                  deleteIcon={<CloseIcon fontSize="small" />}
                 />
               ))}
             </Stack>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
-              <TextField
-                size="small"
-                placeholder="e.g. de"
-                value={newLocale}
-                onChange={(e) => setNewLocale(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleAddLocale()}
-                slotProps={{ htmlInput: { maxLength: 5 } }}
-                sx={{ width: 100 }}
-              />
-              <IconButton
-                size="small"
-                onClick={handleAddLocale}
-                disabled={!newLocale.trim() || newLocale.trim().length < 2}
-              >
-                <AddIcon fontSize="small" />
-              </IconButton>
-            </Box>
+            <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+              Configured via <code>APP_LOCALES</code> environment variable
+            </Typography>
           </Box>
 
           <Box sx={{ mb: 3 }}>
             <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-              Default Locale
+              Default Language
             </Typography>
             <ToggleButtonGroup
               value={selectedDefault}
@@ -150,7 +102,7 @@ export function GlobalSettings() {
               }}
               size="small"
             >
-              {locales.map((loc) => (
+              {supportedLocales.map((loc) => (
                 <ToggleButton key={loc} value={loc} sx={{ textTransform: 'uppercase', px: 2 }}>
                   {loc}
                 </ToggleButton>

@@ -15,17 +15,16 @@ use Symfony\Component\Routing\Attribute\Route;
 class LocaleSettingsController
 {
     public const KEY_DEFAULT_LOCALE = 'default_locale';
-    public const KEY_SUPPORTED_LOCALES = 'supported_locales';
 
     /** @var list<string> */
-    private readonly array $envSupportedLocales;
+    private readonly array $supportedLocales;
 
     public function __construct(
         private readonly SettingRepository $settingRepository,
         string $appLocales,
         private readonly string $envDefaultLocale,
     ) {
-        $this->envSupportedLocales = explode('|', $appLocales);
+        $this->supportedLocales = explode('|', $appLocales);
     }
 
     #[Route('/api/locale-settings', name: 'api_locale_settings_get', methods: ['GET'])]
@@ -33,7 +32,7 @@ class LocaleSettingsController
     {
         return new JsonResponse([
             'defaultLocale' => $this->getDefaultLocale(),
-            'supportedLocales' => $this->getSupportedLocales(),
+            'supportedLocales' => $this->supportedLocales,
         ]);
     }
 
@@ -42,58 +41,29 @@ class LocaleSettingsController
     {
         $data = json_decode($request->getContent(), true);
 
-        if (!is_array($data)) {
-            return new JsonResponse(['error' => 'Invalid JSON'], Response::HTTP_BAD_REQUEST);
+        if (!is_array($data) || !isset($data['defaultLocale']) || !is_string($data['defaultLocale'])) {
+            return new JsonResponse(['error' => 'Invalid request'], Response::HTTP_BAD_REQUEST);
         }
 
-        if (isset($data['supportedLocales']) && is_array($data['supportedLocales'])) {
-            $locales = array_filter($data['supportedLocales'], 'is_string');
-            $locales = array_map('strtolower', $locales);
-            $locales = array_values(array_unique($locales));
+        $defaultLocale = strtolower($data['defaultLocale']);
 
-            if (count($locales) > 0) {
-                $this->settingRepository->set(self::KEY_SUPPORTED_LOCALES, implode('|', $locales));
-            }
+        if (!in_array($defaultLocale, $this->supportedLocales, true)) {
+            return new JsonResponse(
+                ['error' => 'Default locale must be one of the supported locales'],
+                Response::HTTP_BAD_REQUEST,
+            );
         }
 
-        // Reload supported locales after potential update
-        $supportedLocales = $this->getSupportedLocales();
-
-        if (isset($data['defaultLocale']) && is_string($data['defaultLocale'])) {
-            $defaultLocale = strtolower($data['defaultLocale']);
-
-            if (in_array($defaultLocale, $supportedLocales, true)) {
-                $this->settingRepository->set(self::KEY_DEFAULT_LOCALE, $defaultLocale);
-            } else {
-                return new JsonResponse(
-                    ['error' => 'Default locale must be one of the supported locales'],
-                    Response::HTTP_BAD_REQUEST,
-                );
-            }
-        }
+        $this->settingRepository->set(self::KEY_DEFAULT_LOCALE, $defaultLocale);
 
         return new JsonResponse([
-            'defaultLocale' => $this->getDefaultLocale(),
-            'supportedLocales' => $this->getSupportedLocales(),
+            'defaultLocale' => $defaultLocale,
+            'supportedLocales' => $this->supportedLocales,
         ]);
     }
 
     private function getDefaultLocale(): string
     {
         return $this->settingRepository->get(self::KEY_DEFAULT_LOCALE) ?? $this->envDefaultLocale;
-    }
-
-    /**
-     * @return list<string>
-     */
-    private function getSupportedLocales(): array
-    {
-        $dbValue = $this->settingRepository->get(self::KEY_SUPPORTED_LOCALES);
-
-        if ($dbValue !== null) {
-            return explode('|', $dbValue);
-        }
-
-        return $this->envSupportedLocales;
     }
 }
