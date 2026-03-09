@@ -10,7 +10,7 @@ import {
 } from 'react-admin';
 import type { RaRecord } from 'react-admin';
 import { useMemo, useCallback } from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 
 interface TreeChoice {
   id: string;

@@ -7,6 +7,7 @@ import {
   ResourceDefinitionContextProvider,
 } from 'react-admin';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { MemoryRouter } from 'react-router-dom';
 
 import { PsychedSchemaContext } from '../providers/PsychedSchemaContext.ts';
 import { PsychedSchemaProvider } from '../providers/PsychedSchemaProvider.tsx';
@@ -17,18 +18,18 @@ import { usePsychedSchema } from '../hooks/usePsychedSchema.ts';
 import { useContentTypes } from '../hooks/useContentTypes.ts';
 
 const dataProvider = {
-  getList: () => Promise.resolve({ data: [], total: 0 }),
+  getList: () => Promise.resolve({ data: [] as any[], total: 0 }),
   getOne: () =>
     Promise.resolve({
-      data: { id: 1, title: 'Existing Post', body: '<p>Content</p>', slug: 'existing-post' },
+      data: { id: 1, title: 'Existing Post', body: '<p>Content</p>', slug: 'existing-post' } as any,
     }),
-  getMany: () => Promise.resolve({ data: [] }),
-  getManyReference: () => Promise.resolve({ data: [], total: 0 }),
-  update: () => Promise.resolve({ data: { id: 1 } }),
-  updateMany: () => Promise.resolve({ data: [] }),
-  create: () => Promise.resolve({ data: { id: 1 } }),
-  delete: () => Promise.resolve({ data: { id: 1 } }),
-  deleteMany: () => Promise.resolve({ data: [] }),
+  getMany: () => Promise.resolve({ data: [] as any[] }),
+  getManyReference: () => Promise.resolve({ data: [] as any[], total: 0 }),
+  update: () => Promise.resolve({ data: { id: 1 } as any }),
+  updateMany: () => Promise.resolve({ data: [] as any[] }),
+  create: () => Promise.resolve({ data: { id: 1 } as any }),
+  delete: () => Promise.resolve({ data: { id: 1 } as any }),
+  deleteMany: () => Promise.resolve({ data: [] as any[] }),
 };
 
 const theme = createTheme();
@@ -193,7 +194,7 @@ function createIntegrationWrapper(schema: PsychedSchema, resourceName: string) {
     return (
       <ThemeProvider theme={theme}>
         <AdminContext dataProvider={dataProvider}>
-          <PsychedSchemaContext.Provider value={{ schema, loading: false, error: null }}>
+          <PsychedSchemaContext.Provider value={{ schema, loading: false, error: null, entrypoint: 'http://localhost/api' }}>
             <ResourceDefinitionContextProvider
               definitions={{
                 [resourceName]: {
@@ -238,7 +239,7 @@ describe('Integration: Schema Provider -> Hooks -> Components', () => {
     }
 
     render(
-      <PsychedSchemaContext.Provider value={{ schema: mockSchema, loading: false, error: null }}>
+      <PsychedSchemaContext.Provider value={{ schema: mockSchema, loading: false, error: null, entrypoint: 'http://localhost/api' }}>
         <TestComponent />
       </PsychedSchemaContext.Provider>
     );
@@ -315,11 +316,13 @@ describe('Integration: Create Form with Field Groups', () => {
 describe('Integration: Menu Categorizes Resources Correctly', () => {
   it('separates ContentType resources into Content section and others into Admin', () => {
     render(
-      <ThemeProvider theme={theme}>
-        <PsychedSchemaContext.Provider value={{ schema: mockSchema, loading: false, error: null }}>
-          <PsychedMenu />
-        </PsychedSchemaContext.Provider>
-      </ThemeProvider>
+      <MemoryRouter>
+        <ThemeProvider theme={theme}>
+          <PsychedSchemaContext.Provider value={{ schema: mockSchema, loading: false, error: null, entrypoint: 'http://localhost/api' }}>
+            <PsychedMenu />
+          </PsychedSchemaContext.Provider>
+        </ThemeProvider>
+      </MemoryRouter>
     );
 
     expect(screen.getByText('Content')).toBeDefined();
@@ -332,11 +335,13 @@ describe('Integration: Menu Categorizes Resources Correctly', () => {
 
   it('displays correct labels for Content resources from contentType metadata', () => {
     render(
-      <ThemeProvider theme={theme}>
-        <PsychedSchemaContext.Provider value={{ schema: mockSchema, loading: false, error: null }}>
-          <PsychedMenu />
-        </PsychedSchemaContext.Provider>
-      </ThemeProvider>
+      <MemoryRouter>
+        <ThemeProvider theme={theme}>
+          <PsychedSchemaContext.Provider value={{ schema: mockSchema, loading: false, error: null, entrypoint: 'http://localhost/api' }}>
+            <PsychedMenu />
+          </PsychedSchemaContext.Provider>
+        </ThemeProvider>
+      </MemoryRouter>
     );
 
     expect(screen.getByText('Posts')).toBeDefined();
@@ -360,7 +365,7 @@ describe('Integration: Loading State Handling', () => {
     }
 
     render(
-      <PsychedSchemaContext.Provider value={{ schema: null, loading: true, error: null }}>
+      <PsychedSchemaContext.Provider value={{ schema: null, loading: true, error: null, entrypoint: 'http://localhost/api' }}>
         <TestComponent />
       </PsychedSchemaContext.Provider>
     );
@@ -384,7 +389,7 @@ describe('Integration: Loading State Handling', () => {
 
     render(
       <PsychedSchemaContext.Provider
-        value={{ schema: null, loading: false, error: new Error('Network error') }}
+        value={{ schema: null, loading: false, error: new Error('Network error'), entrypoint: 'http://localhost/api' }}
       >
         <TestComponent />
       </PsychedSchemaContext.Provider>
@@ -418,7 +423,7 @@ describe('Integration: Full Flow with Multiple Resources', () => {
     }
 
     render(
-      <PsychedSchemaContext.Provider value={{ schema: mockSchema, loading: false, error: null }}>
+      <PsychedSchemaContext.Provider value={{ schema: mockSchema, loading: false, error: null, entrypoint: 'http://localhost/api' }}>
         <TestComponent />
       </PsychedSchemaContext.Provider>
     );

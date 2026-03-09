@@ -89,7 +89,7 @@ const mockSchema: PsychedSchema = {
 function createWrapper(schema: PsychedSchema | null, loading = false) {
   return function Wrapper({ children }: { children: ReactNode }) {
     return (
-      <PsychedSchemaContext.Provider value={{ schema, loading, error: null }}>
+      <PsychedSchemaContext.Provider value={{ schema, loading, error: null, entrypoint: 'http://localhost/api' }}>
         {children}
       </PsychedSchemaContext.Provider>
     );

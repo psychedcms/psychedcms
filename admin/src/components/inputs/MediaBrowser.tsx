@@ -12,7 +12,6 @@ import {
   ImageListItem,
   ImageListItemBar,
   Typography,
-  IconButton,
   ToggleButtonGroup,
   ToggleButton,
   List,

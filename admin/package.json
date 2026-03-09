@@ -13,8 +13,6 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@psychedcms/admin-core": "file:../packages/admin-core",
-    "@psychedcms/admin-translatable": "file:../packages/admin-translatable",
     "@api-platform/admin": "^4.0.8",
     "@mui/x-date-pickers": "^8.26.0",
     "@psychedcms/admin-core": "file:../packages/admin-core",

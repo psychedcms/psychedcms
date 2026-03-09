@@ -96,7 +96,7 @@ export function ImageListInput({
   );
 
   const handleBrowseSelect = useCallback(
-    (media: { '@id': string; url?: string; thumbnailUrl?: string; originalFilename?: string }) => {
+    (media: Record<string, any>) => {
       const newIri = media['@id'];
       if (currentIris.includes(newIri)) return;
 

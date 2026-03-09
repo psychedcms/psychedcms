@@ -8,7 +8,7 @@ import {
   TopToolbar,
   CreateButton,
 } from 'react-admin';
-import { Typography, Box } from '@mui/material';
+import { Typography } from '@mui/material';
 
 function GenreTree() {
   const { data } = useListContext();

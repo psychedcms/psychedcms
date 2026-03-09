@@ -123,20 +123,29 @@ function PsychedAdmin({ i18nProvider }: { i18nProvider: ReturnType<typeof create
     <HydraAdmin entrypoint={entrypoint} dataProvider={dataProvider} i18nProvider={i18nProvider} layout={PsychedLayout}>
       {resources
         .filter((r) => !r.deprecated)
-        .map((resource) => (
-          <ResourceGuesser
-            key={resource.name}
-            name={resource.name}
-            list={PsychedListGuesser}
-            show={PsychedShowGuesser}
-            create={PsychedCreateGuesser}
-            edit={PsychedEditGuesser}
-            {...(resource.name === 'taxonomies' ? { list: TaxonomyList, recordRepresentation: 'name' } : {})}
-            {...(resource.name === 'genres' ? { list: GenreList, create: GenreCreate, edit: GenreEdit, recordRepresentation: 'taxonomyLabel' } : {})}
-            {...(resource.name === 'media' ? { list: MediaList, edit: MediaEdit, recordRepresentation: 'originalFilename' } : {})}
-            {...(resource.name === 'users' ? { recordRepresentation: 'email' } : {})}
-          />
-        ))}
+        .map((resource) => {
+          const overrides: Record<string, any> = {};
+          if (resource.name === 'taxonomies') {
+            Object.assign(overrides, { list: TaxonomyList, recordRepresentation: 'name' });
+          } else if (resource.name === 'genres') {
+            Object.assign(overrides, { list: GenreList, create: GenreCreate, edit: GenreEdit, recordRepresentation: 'taxonomyLabel' });
+          } else if (resource.name === 'media') {
+            Object.assign(overrides, { list: MediaList, edit: MediaEdit, recordRepresentation: 'originalFilename' });
+          } else if (resource.name === 'users') {
+            Object.assign(overrides, { recordRepresentation: 'email' });
+          }
+          return (
+            <ResourceGuesser
+              key={resource.name}
+              name={resource.name}
+              list={PsychedListGuesser}
+              show={PsychedShowGuesser}
+              create={PsychedCreateGuesser}
+              edit={PsychedEditGuesser}
+              {...overrides}
+            />
+          );
+        })}
       <CustomRoutes>
         {renderSettingsRoutes()}
       </CustomRoutes>

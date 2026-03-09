@@ -1,3 +1,4 @@
+import type { ReactElement } from 'react';
 import { ShowGuesser, type ShowGuesserProps } from '@api-platform/admin';
 import {
   Show,
@@ -11,10 +12,8 @@ import {
   ReferenceArrayField,
   SingleFieldList,
   ChipField,
-  FunctionField,
   useResourceContext,
 } from 'react-admin';
-import type { RaRecord } from 'react-admin';
 
 import { usePsychedSchema } from '../../hooks/usePsychedSchema.ts';
 import type { FieldMetadata, FieldType } from '../../types/psychedcms.ts';
@@ -56,7 +55,7 @@ function getShowField(fieldName: string, meta: FieldMetadata) {
     );
   }
 
-  const displayMap: Partial<Record<FieldType, JSX.Element>> = {
+  const displayMap: Partial<Record<FieldType, ReactElement>> = {
     html: <RichTextField key={fieldName} source={fieldName} label={label} />,
     markdown: <RichTextField key={fieldName} source={fieldName} label={label} />,
     date: <DateField key={fieldName} source={fieldName} label={label} showTime />,

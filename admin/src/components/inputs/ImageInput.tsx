@@ -126,7 +126,7 @@ export function ImageInput({
   );
 
   const handleBrowseSelect = useCallback(
-    (media: { '@id': string; url?: string; thumbnailUrl?: string; altText?: string; originalFilename?: string }) => {
+    (media: Record<string, any>) => {
       field.onChange(media['@id']);
       setPreview({
         url: media.url,

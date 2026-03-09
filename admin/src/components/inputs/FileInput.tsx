@@ -91,7 +91,7 @@ export function FileInput({
   );
 
   const handleBrowseSelect = useCallback(
-    (media: { '@id': string; originalFilename?: string; mimeType?: string; size?: number }) => {
+    (media: Record<string, any>) => {
       field.onChange(media['@id']);
       setFileInfo({
         originalFilename: media.originalFilename,

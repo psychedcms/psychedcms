@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import type { ReactNode } from 'react';
+import { MemoryRouter } from 'react-router-dom';
 
 import { PsychedSchemaContext } from '../providers/PsychedSchemaContext.ts';
 import type { PsychedSchema, ResourceSchema } from '../types/psychedcms.ts';
@@ -88,9 +89,11 @@ const mockSchema: PsychedSchema = {
 function createWrapper(schema: PsychedSchema | null, loading = false) {
   return function Wrapper({ children }: { children: ReactNode }) {
     return (
-      <PsychedSchemaContext.Provider value={{ schema, loading, error: null }}>
-        {children}
-      </PsychedSchemaContext.Provider>
+      <MemoryRouter>
+        <PsychedSchemaContext.Provider value={{ schema, loading, error: null, entrypoint: 'http://localhost/api' }}>
+          {children}
+        </PsychedSchemaContext.Provider>
+      </MemoryRouter>
     );
   };
 }

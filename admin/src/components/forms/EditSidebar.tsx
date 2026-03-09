@@ -22,8 +22,8 @@ import {
 import { useController } from 'react-hook-form';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { renderTimeViewClock } from '@mui/x-date-pickers/timeViewRenderers';
-import dayjs, { type Dayjs } from 'dayjs';
-import { formatDistanceToNow } from 'date-fns';
+import dayjs from 'dayjs';
+import { formatDistanceToNow, type Locale as DateFnsLocale } from 'date-fns';
 import { fr } from 'date-fns/locale/fr';
 import { WorkflowButton } from './WorkflowButton.tsx';
 import { SidebarSlot } from '@psychedcms/admin-core';
@@ -47,7 +47,7 @@ const statusColors: Record<string, 'default' | 'primary' | 'secondary' | 'error'
   archived: 'error',
 };
 
-const dateFnsLocales: Record<string, Locale> = { fr };
+const dateFnsLocales: Record<string, DateFnsLocale> = { fr };
 
 const clockRenderers = {
   hours: renderTimeViewClock,

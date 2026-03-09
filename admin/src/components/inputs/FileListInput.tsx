@@ -104,7 +104,7 @@ export function FileListInput({
   );
 
   const handleBrowseSelect = useCallback(
-    (media: { '@id': string; originalFilename?: string; mimeType?: string; size?: number }) => {
+    (media: Record<string, any>) => {
       const newIri = media['@id'];
       if (currentIris.includes(newIri)) return;
 

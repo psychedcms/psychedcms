@@ -2,6 +2,8 @@ import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import type { ReactNode } from 'react';
 import { AdminContext, SimpleForm, ResourceContextProvider, ResourceDefinitionContextProvider } from 'react-admin';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 import { PsychedSchemaContext } from '../providers/PsychedSchemaContext.ts';
 import type { PsychedSchema } from '../types/psychedcms.ts';
@@ -10,15 +12,15 @@ import { TabbedFormGuesser } from '../components/forms/TabbedFormGuesser.tsx';
 import { ScheduleDialog } from '../components/forms/ScheduleDialog.tsx';
 
 const dataProvider = {
-  getList: () => Promise.resolve({ data: [], total: 0 }),
-  getOne: () => Promise.resolve({ data: { id: 1 } }),
-  getMany: () => Promise.resolve({ data: [] }),
-  getManyReference: () => Promise.resolve({ data: [], total: 0 }),
-  update: () => Promise.resolve({ data: { id: 1 } }),
-  updateMany: () => Promise.resolve({ data: [] }),
-  create: () => Promise.resolve({ data: { id: 1 } }),
-  delete: () => Promise.resolve({ data: { id: 1 } }),
-  deleteMany: () => Promise.resolve({ data: [] }),
+  getList: () => Promise.resolve({ data: [] as any[], total: 0 }),
+  getOne: () => Promise.resolve({ data: { id: 1 } as any }),
+  getMany: () => Promise.resolve({ data: [] as any[] }),
+  getManyReference: () => Promise.resolve({ data: [] as any[], total: 0 }),
+  update: () => Promise.resolve({ data: { id: 1 } as any }),
+  updateMany: () => Promise.resolve({ data: [] as any[] }),
+  create: () => Promise.resolve({ data: { id: 1 } as any }),
+  delete: () => Promise.resolve({ data: { id: 1 } as any }),
+  deleteMany: () => Promise.resolve({ data: [] as any[] }),
 };
 
 const mockSchemaWithGroups: PsychedSchema = {
@@ -126,27 +128,29 @@ function createFormWrapper(
 ) {
   return function Wrapper({ children }: { children: ReactNode }) {
     return (
-      <AdminContext dataProvider={dataProvider}>
-        <PsychedSchemaContext.Provider value={{ schema, loading: false, error: null }}>
-          <ResourceDefinitionContextProvider
-            definitions={{
-              [resourceName]: {
-                name: resourceName,
-                hasCreate: true,
-                hasEdit: true,
-                hasShow: false,
-                hasList: true,
-              },
-            }}
-          >
-            <ResourceContextProvider value={resourceName}>
-              <SimpleForm defaultValues={defaultValues} toolbar={false}>
-                {children}
-              </SimpleForm>
-            </ResourceContextProvider>
-          </ResourceDefinitionContextProvider>
-        </PsychedSchemaContext.Provider>
-      </AdminContext>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <AdminContext dataProvider={dataProvider}>
+          <PsychedSchemaContext.Provider value={{ schema, loading: false, error: null, entrypoint: 'http://localhost/api' }}>
+            <ResourceDefinitionContextProvider
+              definitions={{
+                [resourceName]: {
+                  name: resourceName,
+                  hasCreate: true,
+                  hasEdit: true,
+                  hasShow: false,
+                  hasList: true,
+                },
+              }}
+            >
+              <ResourceContextProvider value={resourceName}>
+                <SimpleForm defaultValues={defaultValues} toolbar={false}>
+                  {children}
+                </SimpleForm>
+              </ResourceContextProvider>
+            </ResourceDefinitionContextProvider>
+          </PsychedSchemaContext.Provider>
+        </AdminContext>
+      </LocalizationProvider>
     );
   };
 }
@@ -250,8 +254,9 @@ describe('PsychedInputGuesser', () => {
     );
 
     await waitFor(() => {
-      const input = screen.getByLabelText('Starts At');
-      expect(input).toBeDefined();
+      // MUI X DateTimePicker renders the label in multiple elements
+      const inputs = screen.getAllByLabelText('Starts At');
+      expect(inputs.length).toBeGreaterThan(0);
     });
   });
 
@@ -286,8 +291,9 @@ describe('PsychedInputGuesser', () => {
     );
 
     await waitFor(() => {
-      const input = screen.getByLabelText('Published On');
-      expect(input).toBeDefined();
+      // MUI X DatePicker renders the label in multiple elements
+      const inputs = screen.getAllByLabelText('Published On');
+      expect(inputs.length).toBeGreaterThan(0);
     });
   });
 
@@ -333,7 +339,7 @@ describe('TabbedFormGuesser', () => {
     const { container } = render(
       <AdminContext dataProvider={dataProvider}>
         <PsychedSchemaContext.Provider
-          value={{ schema: mockSchemaWithGroups, loading: false, error: null }}
+          value={{ schema: mockSchemaWithGroups, loading: false, error: null, entrypoint: 'http://localhost/api' }}
         >
           <ResourceDefinitionContextProvider
             definitions={{
@@ -369,7 +375,7 @@ describe('TabbedFormGuesser', () => {
     const { container } = render(
       <AdminContext dataProvider={dataProvider}>
         <PsychedSchemaContext.Provider
-          value={{ schema: mockSchemaWithSingleGroup, loading: false, error: null }}
+          value={{ schema: mockSchemaWithSingleGroup, loading: false, error: null, entrypoint: 'http://localhost/api' }}
         >
           <ResourceDefinitionContextProvider
             definitions={{
@@ -406,7 +412,9 @@ describe('ScheduleDialog', () => {
     const onConfirm = vi.fn();
 
     render(
-      <ScheduleDialog open={true} onClose={onClose} onConfirm={onConfirm} />
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <ScheduleDialog open={true} onClose={onClose} onConfirm={onConfirm} />
+      </LocalizationProvider>
     );
 
     expect(screen.getByText('Schedule Publication')).toBeDefined();
@@ -420,7 +428,9 @@ describe('ScheduleDialog', () => {
     const onConfirm = vi.fn();
 
     render(
-      <ScheduleDialog open={false} onClose={onClose} onConfirm={onConfirm} />
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <ScheduleDialog open={false} onClose={onClose} onConfirm={onConfirm} />
+      </LocalizationProvider>
     );
 
     expect(screen.queryByText('Schedule Publication')).toBeNull();
@@ -431,7 +441,9 @@ describe('ScheduleDialog', () => {
     const onConfirm = vi.fn();
 
     render(
-      <ScheduleDialog open={true} onClose={onClose} onConfirm={onConfirm} />
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <ScheduleDialog open={true} onClose={onClose} onConfirm={onConfirm} />
+      </LocalizationProvider>
     );
 
     fireEvent.click(screen.getByRole('button', { name: /cancel/i }));
@@ -443,7 +455,9 @@ describe('ScheduleDialog', () => {
     const onConfirm = vi.fn();
 
     render(
-      <ScheduleDialog open={true} onClose={onClose} onConfirm={onConfirm} />
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <ScheduleDialog open={true} onClose={onClose} onConfirm={onConfirm} />
+      </LocalizationProvider>
     );
 
     // Default value is 1 hour in the future, so just clicking schedule should work
@@ -460,7 +474,9 @@ describe('ScheduleDialog', () => {
     const onConfirm = vi.fn();
 
     render(
-      <ScheduleDialog open={true} onClose={onClose} onConfirm={onConfirm} loading={true} />
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <ScheduleDialog open={true} onClose={onClose} onConfirm={onConfirm} loading={true} />
+      </LocalizationProvider>
     );
 
     const cancelButton = screen.getByRole('button', { name: /cancel/i });

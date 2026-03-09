@@ -8,7 +8,6 @@ import {
   useRedirect,
   TopToolbar,
   CreateButton,
-  Button,
 } from 'react-admin';
 import type { RaRecord } from 'react-admin';
 import {
@@ -33,7 +32,6 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import LabelIcon from '@mui/icons-material/Label';
 import CategoryIcon from '@mui/icons-material/Category';
 import { useTaxonomyTypes } from '../../hooks/useTaxonomyTypes.ts';
-import type { GenericTaxonomyType, EntityTaxonomyType } from '../../hooks/useTaxonomyTypes.ts';
 
 // ─── Shared tree helpers ───────────────────────────────────────────────
 
@@ -128,7 +126,7 @@ function CategoriesIndex({ onSelect }: { onSelect: (t: SelectedTaxonomy) => void
           </Typography>
           <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 2 }}>
             {tags.map((entry) => (
-              <TaxonomyCard key={entry.type} entry={entry} onSelect={onSelect} />
+              <TaxonomyCard key={entry.kind === 'generic' ? entry.type : entry.resource} entry={entry} onSelect={onSelect} />
             ))}
           </Box>
         </Box>
@@ -141,7 +139,7 @@ function CategoriesIndex({ onSelect }: { onSelect: (t: SelectedTaxonomy) => void
           </Typography>
           <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 2 }}>
             {categories.map((entry) => (
-              <TaxonomyCard key={entry.resource} entry={entry} onSelect={onSelect} />
+              <TaxonomyCard key={entry.kind === 'entity' ? entry.resource : entry.type} entry={entry} onSelect={onSelect} />
             ))}
           </Box>
         </Box>
