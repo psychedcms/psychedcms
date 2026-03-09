@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNotify } from 'react-admin';
 import {
   Box,
@@ -42,6 +42,11 @@ export function GlobalSettings() {
 
   const [selectedDefault, setSelectedDefault] = useState(defaultLocale);
   const [saving, setSaving] = useState(false);
+
+  // Sync local state when the API value loads or changes
+  useEffect(() => {
+    setSelectedDefault(defaultLocale);
+  }, [defaultLocale]);
 
   const hasChanges = selectedDefault !== defaultLocale;
 
