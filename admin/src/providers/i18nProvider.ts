@@ -6,6 +6,13 @@ import { mergePluginI18n } from '@psychedcms/admin-core';
 
 const customEnMessages = {
   psyched: {
+    groups: {
+      content: 'Content',
+      media: 'Media',
+      metadata: 'Metadata',
+      seo: 'SEO',
+      general: 'General',
+    },
     menu: {
       content: 'Content',
       admin: 'Admin',
@@ -70,8 +77,31 @@ const customEnMessages = {
     },
   },
   resources: {
-    pages: { name: 'Pages' },
-    posts: { name: 'Posts' },
+    pages: {
+      name: 'Pages',
+      fields: {
+        title: 'Title',
+        body: 'Content',
+        metaTitle: 'Meta Title',
+        metaDescription: 'Meta Description',
+      },
+    },
+    posts: {
+      name: 'Posts',
+      fields: {
+        title: 'Title',
+        excerpt: 'Excerpt',
+        body: 'Content',
+        featuredImage: 'Featured Image',
+        tags: 'Tags',
+        genres: 'Genres',
+        relatedPosts: 'Related Posts',
+        socialLinks: 'Social Links',
+        externalUrl: 'External URL',
+        eventDate: 'Event Date & Time',
+        location: 'Location',
+      },
+    },
     genres: { name: 'Genres' },
     taxonomies: { name: 'Taxonomies' },
     users: { name: 'Users' },
@@ -81,6 +111,13 @@ const customEnMessages = {
 
 const customFrMessages = {
   psyched: {
+    groups: {
+      content: 'Contenu',
+      media: 'Médias',
+      metadata: 'Métadonnées',
+      seo: 'SEO',
+      general: 'Général',
+    },
     menu: {
       content: 'Contenu',
       admin: 'Administration',
@@ -145,8 +182,31 @@ const customFrMessages = {
     },
   },
   resources: {
-    pages: { name: 'Pages' },
-    posts: { name: 'Articles' },
+    pages: {
+      name: 'Pages',
+      fields: {
+        title: 'Titre',
+        body: 'Contenu',
+        metaTitle: 'Titre SEO',
+        metaDescription: 'Description SEO',
+      },
+    },
+    posts: {
+      name: 'Articles',
+      fields: {
+        title: 'Titre',
+        excerpt: 'Extrait',
+        body: 'Contenu',
+        featuredImage: 'Image mise en avant',
+        tags: 'Tags',
+        genres: 'Genres',
+        relatedPosts: 'Articles liés',
+        socialLinks: 'Liens sociaux',
+        externalUrl: 'URL externe',
+        eventDate: 'Date et heure',
+        location: 'Localisation',
+      },
+    },
     genres: { name: 'Genres' },
     taxonomies: { name: 'Taxonomies' },
     users: { name: 'Utilisateurs' },

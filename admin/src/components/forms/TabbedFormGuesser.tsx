@@ -1,5 +1,6 @@
 import {
   useResourceContext,
+  useTranslate,
   SimpleForm,
   TabbedForm,
 } from 'react-admin';
@@ -52,6 +53,7 @@ export function TabbedFormGuesser({
 }: TabbedFormGuesserProps) {
   const resourceFromContext = useResourceContext();
   const resource = resourceProp ?? resourceFromContext ?? '';
+  const translate = useTranslate();
 
   const resourceSchema = usePsychedSchema(resource);
 
@@ -78,7 +80,9 @@ export function TabbedFormGuesser({
     <TabbedForm>
       {groupOrder.map((group) => {
         const fields = groupedFields.get(group) ?? [];
-        const label = humanizeGroupName(group);
+        const translationKey = `psyched.groups.${group}`;
+        const translated = translate(translationKey);
+        const label = translated !== translationKey ? translated : humanizeGroupName(group);
 
         return (
           <TabbedForm.Tab key={group} label={label}>

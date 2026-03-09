@@ -1,5 +1,6 @@
 import {
   useResourceContext,
+  useTranslate,
   TextInput,
   SelectInput,
   SelectArrayInput,
@@ -51,6 +52,7 @@ export function PsychedInputGuesser({
 }: PsychedInputGuesserProps & { styleOverrides?: unknown }) {
   const resourceFromContext = useResourceContext();
   const resource = resourceProp ?? resourceFromContext ?? '';
+  const translate = useTranslate();
 
   const fieldMetadata = useFieldMetadata(resource, source);
 
@@ -62,11 +64,16 @@ export function PsychedInputGuesser({
     return null;
   }
 
-  const { type, label, placeholder, info, required, readonly } = fieldMetadata;
+  const { type, label: schemaLabel, placeholder, info, required, readonly } = fieldMetadata;
+  const translationKey = `resources.${resource}.fields.${source}`;
+  const translated = translate(translationKey);
+  const label = schemaLabel
+    ? (translated !== translationKey ? translated : schemaLabel)
+    : undefined;
 
   const baseProps: Record<string, unknown> = {
     source,
-    label: label ?? undefined,
+    label,
     helperText: info ?? undefined,
     placeholder: placeholder ?? undefined,
     isRequired: required ?? undefined,
