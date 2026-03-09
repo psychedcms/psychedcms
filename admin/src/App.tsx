@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { HydraAdmin, hydraDataProvider, ResourceGuesser } from '@api-platform/admin';
 import { CustomRoutes } from 'react-admin';
 import { Route } from 'react-router-dom';
@@ -8,6 +8,7 @@ import { PsychedSchemaProvider } from './providers/PsychedSchemaProvider.tsx';
 import { EditLocaleProvider } from './providers/EditLocaleContext.tsx';
 import { localeHttpClient } from './providers/localeHttpClient.ts';
 import { useLocaleSettings } from './hooks/useLocaleSettings.ts';
+import { createI18nProvider } from './providers/i18nProvider.ts';
 import { PsychedLayout } from './components/layout/index.ts';
 import { GlobalSettings, PreferencesSettings } from './components/settings/index.ts';
 import { PsychedCreateGuesser, PsychedEditGuesser, PsychedShowGuesser, PsychedListGuesser, TaxonomyList, GenreList, GenreCreate, GenreEdit, MediaList, MediaEdit } from './components/forms/index.ts';
@@ -23,7 +24,7 @@ const dataProvider = hydraDataProvider({
  * Custom component that renders resources with our custom Create/Edit guessers.
  * Uses HydraAdmin's dataProvider introspection to discover resources dynamically.
  */
-function PsychedAdmin() {
+function PsychedAdmin({ i18nProvider }: { i18nProvider: ReturnType<typeof createI18nProvider> }) {
   const [resources, setResources] = useState<Resource[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -45,11 +46,11 @@ function PsychedAdmin() {
   }
 
   if (resources.length === 0) {
-    return <HydraAdmin entrypoint={entrypoint} dataProvider={dataProvider} layout={PsychedLayout} />;
+    return <HydraAdmin entrypoint={entrypoint} dataProvider={dataProvider} i18nProvider={i18nProvider} layout={PsychedLayout} />;
   }
 
   return (
-    <HydraAdmin entrypoint={entrypoint} dataProvider={dataProvider} layout={PsychedLayout}>
+    <HydraAdmin entrypoint={entrypoint} dataProvider={dataProvider} i18nProvider={i18nProvider} layout={PsychedLayout}>
       {resources
         .filter((r) => !r.deprecated)
         .map((resource) => (
@@ -77,6 +78,12 @@ function PsychedAdmin() {
 function App() {
   const { defaultLocale, loading } = useLocaleSettings();
 
+  // Create i18n provider with the user's preferred locale (from localStorage or API default)
+  const i18nProvider = useMemo(() => {
+    const stored = localStorage.getItem('psyched_edit_locale');
+    return createI18nProvider(stored ?? defaultLocale);
+  }, [defaultLocale]);
+
   if (loading) {
     return null;
   }
@@ -84,7 +91,7 @@ function App() {
   return (
     <PsychedSchemaProvider entrypoint={entrypoint}>
       <EditLocaleProvider defaultLocale={defaultLocale}>
-        <PsychedAdmin />
+        <PsychedAdmin i18nProvider={i18nProvider} />
       </EditLocaleProvider>
     </PsychedSchemaProvider>
   );

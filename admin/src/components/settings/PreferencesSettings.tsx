@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNotify } from 'react-admin';
+import { useNotify, useLocaleState } from 'react-admin';
 import {
   Box,
   Card,
@@ -16,17 +16,19 @@ import { useEditLocale } from '../../providers/EditLocaleContext.tsx';
 import { useLocaleSettings } from '../../hooks/useLocaleSettings.ts';
 
 /**
- * User Preferences page — allows the user to set their preferred editing locale.
- * The preference is persisted to localStorage (and will sync to user profile when auth is available).
+ * User Preferences page — allows the user to set their preferred locale.
+ * Changes both the admin UI language and the editing locale.
  */
 export function PreferencesSettings() {
   const { locale, setLocale } = useEditLocale();
+  const [, setRaLocale] = useLocaleState();
   const { supportedLocales } = useLocaleSettings();
   const notify = useNotify();
   const [selectedLocale, setSelectedLocale] = useState(locale);
 
   const handleSave = () => {
     setLocale(selectedLocale);
+    setRaLocale(selectedLocale);
     notify('Preferences saved', { type: 'success' });
   };
 
@@ -46,8 +48,8 @@ export function PreferencesSettings() {
           </Box>
 
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Choose your preferred editing language. This will be used as the default
-            locale when editing translatable content.
+            Choose your preferred language. This sets both the admin interface
+            language and the default locale for editing translatable content.
           </Typography>
 
           <ToggleButtonGroup
