@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
 export interface LocaleSettings {
   defaultLocale: string;
@@ -10,15 +10,16 @@ const entrypoint = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 /**
  * Fetches global locale settings from the API.
  * Returns default values while loading.
+ * Provides a reload function to refresh after settings are updated.
  */
-export function useLocaleSettings(): LocaleSettings & { loading: boolean } {
+export function useLocaleSettings(): LocaleSettings & { loading: boolean; reload: () => void } {
   const [settings, setSettings] = useState<LocaleSettings>({
     defaultLocale: 'en',
     supportedLocales: ['en'],
   });
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const fetchSettings = useCallback(() => {
     fetch(`${entrypoint}/locale-settings`)
       .then((res) => res.json())
       .then((data: LocaleSettings) => {
@@ -30,5 +31,9 @@ export function useLocaleSettings(): LocaleSettings & { loading: boolean } {
       });
   }, []);
 
-  return { ...settings, loading };
+  useEffect(() => {
+    fetchSettings();
+  }, [fetchSettings]);
+
+  return { ...settings, loading, reload: fetchSettings };
 }

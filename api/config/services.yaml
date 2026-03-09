@@ -30,7 +30,7 @@ services:
     App\Controller\LocaleSettingsController:
         arguments:
             $appLocales: '%app_locales%'
-            $defaultLocale: '%app_default_locale%'
+            $envDefaultLocale: '%app_default_locale%'
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
