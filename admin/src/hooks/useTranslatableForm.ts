@@ -11,7 +11,7 @@ const entrypoint = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 /**
  * Hook that manages per-locale translatable field values inside a react-hook-form.
  *
- * - On mount: stores default locale values from the record, fetches other locales
+ * - On mount: stores current locale values from the record, fetches other locales
  * - On locale switch: saves current form values to store, loads new locale's values
  * - Provides `getAllLocaleContents()` for multi-locale save
  *
@@ -27,6 +27,9 @@ export function useTranslatableForm(resource: string) {
   const localeContents = useRef<Record<string, Record<string, unknown>>>({});
   const prevLocale = useRef<string | null>(null);
   const recordId = useRef<string | number | null>(null);
+  // Capture the locale at initialization time to avoid race conditions
+  // with useLocaleSettings loading (which starts as 'en' before API resolves).
+  const initLocale = useRef<string | null>(null);
 
   const translatableFields = useMemo(() => {
     if (!resourceSchema) return [];
@@ -39,7 +42,9 @@ export function useTranslatableForm(resource: string) {
   const locales = resourceSchema?.contentType?.locales ?? [];
   const defaultLocale = localeSettings.defaultLocale;
 
-  // Initialize: store default locale values, fetch other locales in background
+  // Initialize: store current locale values from the record, fetch others in background.
+  // Uses `locale` from EditLocaleContext (stable from mount) rather than `defaultLocale`
+  // from useLocaleSettings (which transitions from 'en' → actual default during load).
   useEffect(() => {
     if (!record || !record.id || translatableFields.length === 0) return;
 
@@ -48,31 +53,35 @@ export function useTranslatableForm(resource: string) {
       localeContents.current = {};
       recordId.current = record.id;
       prevLocale.current = null;
+      initLocale.current = null;
     }
 
     // Already initialized for this record
-    if (localeContents.current[defaultLocale]) return;
+    if (initLocale.current !== null) return;
 
-    // Store default locale values from the record
-    const defaultValues: Record<string, unknown> = {};
+    // The record was fetched in the current edit locale (via localeHttpClient).
+    // Store its translatable field values under that locale key.
+    initLocale.current = locale;
+    const recordValues: Record<string, unknown> = {};
     for (const field of translatableFields) {
-      defaultValues[field] = record[field] ?? '';
+      recordValues[field] = record[field] ?? '';
     }
-    localeContents.current[defaultLocale] = defaultValues;
-    prevLocale.current = defaultLocale;
+    localeContents.current[locale] = recordValues;
+    prevLocale.current = locale;
 
-    // Fetch non-default locales in background
+    // Fetch other locales in background (no fallback — empty if untranslated)
     const iri = record['@id'] as string | undefined;
     const origin = new URL(entrypoint).origin;
     const url = iri ? `${origin}${iri}` : `${entrypoint}/${resource}/${record.id}`;
 
     for (const loc of locales) {
-      if (loc === defaultLocale) continue;
+      if (loc === locale) continue;
 
       fetch(url, {
         headers: {
           'Accept': 'application/ld+json',
           'Accept-Language': loc,
+          'X-No-Translation-Fallback': '1',
         },
       })
         .then((res) => res.json())
@@ -84,7 +93,6 @@ export function useTranslatableForm(resource: string) {
           localeContents.current[loc] = values;
         })
         .catch(() => {
-          // Initialize with empty values on failure
           const values: Record<string, unknown> = {};
           for (const field of translatableFields) {
             values[field] = '';
@@ -92,7 +100,7 @@ export function useTranslatableForm(resource: string) {
           localeContents.current[loc] = values;
         });
     }
-  }, [record, translatableFields, locales, defaultLocale, resource]);
+  }, [record, translatableFields, locales, locale, resource]);
 
   // On locale switch: save current values → load target locale values
   useEffect(() => {
