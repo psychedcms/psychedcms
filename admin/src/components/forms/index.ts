@@ -12,3 +12,5 @@ export { GenreList } from './GenreList.tsx';
 export { GenreCreate, GenreEdit } from './GenreForm.tsx';
 export { PsychedResourceGuesser } from './PsychedResourceGuesser.tsx';
 export { WorkflowButton } from './WorkflowButton.tsx';
+export { MediaList } from './MediaList.tsx';
+export { MediaEdit } from './MediaEdit.tsx';

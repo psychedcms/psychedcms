@@ -37,6 +37,10 @@ export type FieldType =
   | 'hidden'
   | 'taxonomy'
   | 'entity_taxonomy'
+  | 'image'
+  | 'file'
+  | 'imagelist'
+  | 'filelist'
   | 'field';
 
 /**
@@ -80,6 +84,11 @@ export interface FieldMetadata {
   // EntityTaxonomyField extras
   order?: string;
   filter?: string;
+  // ImageField / FileField extras
+  maxSize?: number;
+  allowedTypes?: string[];
+  thumbnailWidth?: number;
+  thumbnailHeight?: number;
 }
 
 /**

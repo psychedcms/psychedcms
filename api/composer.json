@@ -20,6 +20,13 @@
         },
         {
             "type": "path",
+            "url": "../packages/psychedcms-media",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
             "url": "../packages/psychedcms-taxonomy",
             "options": {
                 "symlink": true
@@ -37,31 +44,34 @@
         "php": ">=8.2",
         "ext-ctype": "*",
         "ext-iconv": "*",
-        "api-platform/core": "^4.2.14",
+        "api-platform/core": "^4.2.20",
         "composer/installers": "^2.3",
         "doctrine/doctrine-bundle": "^2.18.2",
         "doctrine/doctrine-migrations-bundle": "^3.7",
-        "doctrine/orm": "^3.6.1",
+        "doctrine/orm": "^3.6.2",
         "gedmo/doctrine-extensions": "^3.22",
+        "league/flysystem-bundle": "^3.6.2",
         "nelmio/cors-bundle": "^2.6.1",
         "psychedcms/psychedcms-calendar": "@dev",
         "psychedcms/psychedcms-core": "@dev",
+        "psychedcms/psychedcms-media": "@dev",
         "psychedcms/psychedcms-taxonomy": "@dev",
         "psychedcms/psychedcms-workflow": "@dev",
-        "symfony/amqp-messenger": "7.4.*",
-        "symfony/workflow": "7.4.*",
         "stof/doctrine-extensions-bundle": "^1.15.3",
+        "symfony/amqp-messenger": "7.4.*",
         "symfony/console": "7.4.*",
         "symfony/dotenv": "7.4.*",
         "symfony/flex": "^2.10",
         "symfony/framework-bundle": "7.4.*",
         "symfony/mercure-bundle": "^0.4.2",
         "symfony/messenger": "7.4.*",
-        "symfony/scheduler": "7.4.*",
+        "symfony/mime": "7.4.*",
         "symfony/runtime": "7.4.*",
+        "symfony/scheduler": "7.4.*",
         "symfony/validator": "7.4.*",
+        "symfony/workflow": "7.4.*",
         "symfony/yaml": "7.4.*",
-        "webonyx/graphql-php": "^15.30"
+        "webonyx/graphql-php": "^15.30.2"
     },
     "config": {
         "allow-plugins": {
@@ -83,6 +93,7 @@
             "App\\Tests\\": "tests/",
             "PsychedCms\\Calendar\\Tests\\": "../packages/psychedcms-calendar/tests/",
             "PsychedCms\\Core\\Tests\\": "../packages/psychedcms-core/tests/",
+            "PsychedCms\\Media\\Tests\\": "../packages/psychedcms-media/tests/",
             "PsychedCms\\Taxonomy\\Tests\\": "../packages/psychedcms-taxonomy/tests/",
             "PsychedCms\\Workflow\\Tests\\": "../packages/psychedcms-workflow/tests/"
         }
@@ -122,7 +133,7 @@
         }
     },
     "require-dev": {
-        "doctrine/doctrine-fixtures-bundle": "^4.3",
-        "phpunit/phpunit": "^12.5.7"
+        "doctrine/doctrine-fixtures-bundle": "^4.3.1",
+        "phpunit/phpunit": "^12.5.14"
     }
 }

@@ -17,6 +17,10 @@ import { MarkdownInput } from '../components/inputs/MarkdownInput.tsx';
 import { SlugInput } from '../components/inputs/SlugInput.tsx';
 import { TaxonomyInput } from '../components/inputs/TaxonomyInput.tsx';
 import { EntityTaxonomyInput } from '../components/inputs/EntityTaxonomyInput.tsx';
+import { ImageInput } from '../components/inputs/ImageInput.tsx';
+import { FileInput } from '../components/inputs/FileInput.tsx';
+import { ImageListInput } from '../components/inputs/ImageListInput.tsx';
+import { FileListInput } from '../components/inputs/FileListInput.tsx';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyComponent = ComponentType<any>;
@@ -75,6 +79,18 @@ const fieldTypeMappings: Record<FieldType, FieldTypeConfig> = {
   },
   entity_taxonomy: {
     component: EntityTaxonomyInput as AnyComponent,
+  },
+  image: {
+    component: ImageInput as AnyComponent,
+  },
+  file: {
+    component: FileInput as AnyComponent,
+  },
+  imagelist: {
+    component: ImageListInput as AnyComponent,
+  },
+  filelist: {
+    component: FileListInput as AnyComponent,
   },
   hidden: {
     component: (() => null) as AnyComponent,

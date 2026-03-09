@@ -4,7 +4,7 @@ import type { Resource } from '@api-platform/api-doc-parser';
 
 import { PsychedSchemaProvider } from './providers/PsychedSchemaProvider.tsx';
 import { PsychedLayout } from './components/layout/index.ts';
-import { PsychedCreateGuesser, PsychedEditGuesser, PsychedShowGuesser, PsychedListGuesser, TaxonomyList, GenreList, GenreCreate, GenreEdit } from './components/forms/index.ts';
+import { PsychedCreateGuesser, PsychedEditGuesser, PsychedShowGuesser, PsychedListGuesser, TaxonomyList, GenreList, GenreCreate, GenreEdit, MediaList, MediaEdit } from './components/forms/index.ts';
 
 const entrypoint = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
@@ -53,6 +53,7 @@ function PsychedAdmin() {
             edit={PsychedEditGuesser}
             {...(resource.name === 'taxonomies' ? { list: TaxonomyList, recordRepresentation: 'name' } : {})}
             {...(resource.name === 'genres' ? { list: GenreList, create: GenreCreate, edit: GenreEdit, recordRepresentation: 'taxonomyLabel' } : {})}
+            {...(resource.name === 'media' ? { list: MediaList, edit: MediaEdit, recordRepresentation: 'originalFilename' } : {})}
             {...(resource.name === 'users' ? { recordRepresentation: 'email' } : {})}
           />
         ))}

@@ -9,7 +9,9 @@ return [
     Symfony\Bundle\MercureBundle\MercureBundle::class => ['all' => true],
     Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle::class => ['all' => true],
     PsychedCms\Calendar\PsychedCmsCalendarBundle::class => ['all' => true],
+    PsychedCms\Media\PsychedCmsMediaBundle::class => ['all' => true],
     PsychedCms\Taxonomy\PsychedCmsTaxonomyBundle::class => ['all' => true],
     PsychedCms\Workflow\PsychedCmsWorkflowBundle::class => ['all' => true],
     Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle::class => ['dev' => true, 'test' => true],
+    League\FlysystemBundle\FlysystemBundle::class => ['all' => true],
 ];

@@ -25,6 +25,8 @@ services:
       MERCURE_PUBLIC_URL: ${MERCURE_PUBLIC_URL}
       MERCURE_JWT_SECRET: ${MERCURE_JWT_SECRET}
       MESSENGER_TRANSPORT_DSN: ${MESSENGER_TRANSPORT_DSN}
+      IMGPROXY_URL: ${IMGPROXY_URL:-}
+      MEDIA_PUBLIC_URL: ${MEDIA_PUBLIC_URL:-}
     depends_on:
       database:
         condition: service_healthy
@@ -48,6 +50,7 @@ services:
     environment:
       APP_DOMAIN: ${APP_DOMAIN}
       NGINX_ENVSUBST_OUTPUT_DIR: /etc/nginx/conf.d
+      NGINX_ENVSUBST_FILTER: ^APP_DOMAIN$$
     depends_on:
       - php
     networks:
@@ -135,7 +138,7 @@ services:
       - psyched
 
   # ===========================================================================
-  # MinIO (S3-compatible object storage) - Optional
+  # MinIO (S3-compatible object storage)
   # ===========================================================================
   minio:
     image: minio/minio:latest
@@ -146,12 +149,57 @@ services:
     volumes:
       - minio_data:/data
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "9002:9000"
+      - "9003:9001"
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - psyched
+
+  # ===========================================================================
+  # imgproxy (on-the-fly image processing and thumbnail generation)
+  # ===========================================================================
+  imgproxy:
+    image: darthsim/imgproxy:latest
+    environment:
+      IMGPROXY_USE_S3: "true"
+      IMGPROXY_S3_ENDPOINT: http://minio:9000
+      AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER}
+      AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD}
+      AWS_REGION: us-east-1
+      IMGPROXY_BASE_URL: s3://${MINIO_BUCKET}
+      IMGPROXY_WORKERS: "10"
+      IMGPROXY_MAX_SRC_RESOLUTION: "50"
+      IMGPROXY_ALLOW_INSECURE_URLS: "true"
+      IMGPROXY_AUTO_WEBP: "true"
+      IMGPROXY_AUTO_AVIF: "true"
+      IMGPROXY_CACHE_CONTROL_PASSTHROUGH: "false"
+      IMGPROXY_SET_CANONICAL_HEADER: "false"
+    depends_on:
+      minio:
+        condition: service_healthy
     networks:
       - psyched
     profiles:
-      - storage
+      - media
+
+  # ===========================================================================
+  # imgproxy-proxy (Nginx URL translation for imgproxy)
+  # ===========================================================================
+  imgproxy-proxy:
+    build:
+      context: .docker/imgproxy-proxy
+    depends_on:
+      - imgproxy
+    ports:
+      - "8081:80"
+    networks:
+      - psyched
+    profiles:
+      - media
 
   # ===========================================================================
   # Elasticsearch - Optional

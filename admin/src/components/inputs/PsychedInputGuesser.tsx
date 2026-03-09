@@ -17,6 +17,10 @@ import {
 import { SlugInput } from './SlugInput.tsx';
 import { TaxonomyInput } from './TaxonomyInput.tsx';
 import { EntityTaxonomyInput } from './EntityTaxonomyInput.tsx';
+import { ImageInput } from './ImageInput.tsx';
+import { FileInput } from './FileInput.tsx';
+import { ImageListInput } from './ImageListInput.tsx';
+import { FileListInput } from './FileListInput.tsx';
 
 interface PsychedInputGuesserProps extends Omit<InputProps, 'source'> {
   source: string;
@@ -110,6 +114,54 @@ export function PsychedInputGuesser({
         label={typeof label === 'string' ? label : undefined}
         helperText={typeof info === 'string' ? info : undefined}
         isRequired={required ?? undefined}
+      />
+    );
+  }
+
+  if (type === 'image') {
+    return (
+      <ImageInput
+        source={source}
+        label={typeof label === 'string' ? label : undefined}
+        helperText={typeof info === 'string' ? info : undefined}
+        isRequired={required ?? undefined}
+      />
+    );
+  }
+
+  if (type === 'file') {
+    return (
+      <FileInput
+        source={source}
+        label={typeof label === 'string' ? label : undefined}
+        helperText={typeof info === 'string' ? info : undefined}
+        isRequired={required ?? undefined}
+      />
+    );
+  }
+
+  if (type === 'imagelist') {
+    return (
+      <ImageListInput
+        source={source}
+        label={typeof label === 'string' ? label : undefined}
+        helperText={typeof info === 'string' ? info : undefined}
+        isRequired={required ?? undefined}
+        min={fieldMetadata.min}
+        max={fieldMetadata.max}
+      />
+    );
+  }
+
+  if (type === 'filelist') {
+    return (
+      <FileListInput
+        source={source}
+        label={typeof label === 'string' ? label : undefined}
+        helperText={typeof info === 'string' ? info : undefined}
+        isRequired={required ?? undefined}
+        min={fieldMetadata.min}
+        max={fieldMetadata.max}
       />
     );
   }
