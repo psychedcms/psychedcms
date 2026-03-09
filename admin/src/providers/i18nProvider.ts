@@ -15,9 +15,5 @@ export function createI18nProvider(defaultLocale: string) {
   return polyglotI18nProvider(
     (locale) => messages[locale] ?? englishMessages,
     defaultLocale,
-    [
-      { locale: 'en', name: 'English' },
-      { locale: 'fr', name: 'Français' },
-    ],
   );
 }
