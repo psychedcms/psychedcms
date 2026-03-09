@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { HydraAdmin, hydraDataProvider, ResourceGuesser } from '@api-platform/admin';
+import { CustomRoutes } from 'react-admin';
+import { Route } from 'react-router-dom';
 import type { Resource } from '@api-platform/api-doc-parser';
 
 import { PsychedSchemaProvider } from './providers/PsychedSchemaProvider.tsx';
@@ -7,6 +9,7 @@ import { EditLocaleProvider } from './providers/EditLocaleContext.tsx';
 import { localeHttpClient } from './providers/localeHttpClient.ts';
 import { useLocaleSettings } from './hooks/useLocaleSettings.ts';
 import { PsychedLayout } from './components/layout/index.ts';
+import { GlobalSettings, PreferencesSettings } from './components/settings/index.ts';
 import { PsychedCreateGuesser, PsychedEditGuesser, PsychedShowGuesser, PsychedListGuesser, TaxonomyList, GenreList, GenreCreate, GenreEdit, MediaList, MediaEdit } from './components/forms/index.ts';
 
 const entrypoint = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
@@ -63,6 +66,10 @@ function PsychedAdmin() {
             {...(resource.name === 'users' ? { recordRepresentation: 'email' } : {})}
           />
         ))}
+      <CustomRoutes>
+        <Route path="/settings/global" element={<GlobalSettings />} />
+        <Route path="/settings/preferences" element={<PreferencesSettings />} />
+      </CustomRoutes>
     </HydraAdmin>
   );
 }

@@ -4,11 +4,13 @@ import { Box, Typography, Divider } from '@mui/material';
 
 import { useContentTypes } from '../../hooks/index.ts';
 import { MenuIcon } from './MenuIcon.tsx';
+import { SettingsMenu } from './SettingsMenu.tsx';
 
 /**
  * Custom menu component that separates resources into two sections:
  * - Content: Resources with ContentType metadata (e.g., Posts, Pages)
- * - Admin: Resources without ContentType metadata (e.g., Users, Settings)
+ * - Admin: Resources without ContentType metadata (e.g., Users)
+ * Plus a collapsible Settings section at the bottom.
  */
 export function PsychedMenu() {
   const [open] = useSidebarState();
@@ -87,6 +89,9 @@ export function PsychedMenu() {
           ))}
         </>
       )}
+
+      <Divider sx={{ my: 1 }} />
+      <SettingsMenu />
     </Box>
   );
 }
@@ -119,7 +124,6 @@ function capitalize(str: string): string {
 function getAdminIcon(resourceName: string): string {
   const iconMap: Record<string, string> = {
     users: 'People',
-    settings: 'Settings',
     roles: 'Security',
     permissions: 'Lock',
   };
