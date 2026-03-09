@@ -110,6 +110,9 @@
     "psychedcms/psychedcms-taxonomy": {
         "version": "dev-main"
     },
+    "psychedcms/psychedcms-translatable": {
+        "version": "dev-master"
+    },
     "psychedcms/psychedcms-workflow": {
         "version": "dev-main"
     },

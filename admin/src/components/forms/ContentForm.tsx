@@ -6,11 +6,11 @@ import {
 } from 'react-admin';
 import { Box, Card, Tab, Tabs } from '@mui/material';
 
+import { FormHookSlot } from '@psychedcms/admin-core';
 import { usePsychedSchema } from '../../hooks/usePsychedSchema.ts';
 import { FieldGroup } from './FieldGroup.tsx';
 import { EditSidebar } from './EditSidebar.tsx';
-import { TranslatableFormManager } from './TranslatableFormManager.tsx';
-import type { TranslatableSaveHandle } from './TranslatableFormManager.tsx';
+import type { TranslatableSaveHandle } from '@psychedcms/admin-translatable';
 
 interface ContentFormProps {
   resource?: string;
@@ -61,10 +61,8 @@ function ContentFormLayout({
 
   return (
     <>
-      {/* Renderless: manages per-locale form value swapping */}
-      {translatableSaveRef && (
-        <TranslatableFormManager resource={resource} saveHandleRef={translatableSaveRef} />
-      )}
+      {/* Plugin form hooks (e.g. TranslatableFormManager) */}
+      <FormHookSlot resource={resource} saveHandleRef={translatableSaveRef} />
 
       <Box
         sx={{

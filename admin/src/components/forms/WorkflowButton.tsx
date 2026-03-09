@@ -12,7 +12,7 @@ import {
   CircularProgress,
 } from '@mui/material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import { useRecordContext, useResourceContext, useRefresh } from 'react-admin';
+import { useRecordContext, useResourceContext, useRefresh, useTranslate } from 'react-admin';
 import { useWorkflowState, getTransitionMeta } from '../../hooks/useWorkflowState.ts';
 import { ScheduleDialog } from './ScheduleDialog.tsx';
 
@@ -29,6 +29,7 @@ export function WorkflowButton({ resource: resourceProp }: WorkflowButtonProps) 
   const resourceFromContext = useResourceContext();
   const resource = resourceProp ?? resourceFromContext;
   const refresh = useRefresh();
+  const translate = useTranslate();
 
   const [open, setOpen] = useState(false);
   const [applying, setApplying] = useState(false);
@@ -118,7 +119,7 @@ export function WorkflowButton({ resource: resourceProp }: WorkflowButtonProps) 
           disabled={isDisabled}
           startIcon={applying ? <CircularProgress size={16} color="inherit" /> : undefined}
         >
-          {primaryMeta.label}
+          {translate(primaryMeta.label)}
         </Button>
         <ScheduleDialog
           open={scheduleDialogOpen}
@@ -143,7 +144,7 @@ export function WorkflowButton({ resource: resourceProp }: WorkflowButtonProps) 
           onClick={handlePrimaryClick}
           startIcon={applying ? <CircularProgress size={16} color="inherit" /> : undefined}
         >
-          {primaryMeta.label}
+          {translate(primaryMeta.label)}
         </Button>
         <Button
           size="small"
@@ -175,7 +176,7 @@ export function WorkflowButton({ resource: resourceProp }: WorkflowButtonProps) 
                         key={transition}
                         onClick={() => handleSecondaryClick(transition)}
                       >
-                        <ListItemText>{meta.label}</ListItemText>
+                        <ListItemText>{translate(meta.label)}</ListItemText>
                       </MenuItem>
                     );
                   })}

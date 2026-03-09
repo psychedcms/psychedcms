@@ -4,9 +4,9 @@ import { Edit, useResourceContext, useNotify } from 'react-admin';
 import { Box } from '@mui/material';
 
 import { usePsychedSchema } from '../../hooks/usePsychedSchema.ts';
-import { getCurrentEditLocale } from '../../providers/EditLocaleContext.tsx';
+import { getCurrentEditLocale } from '@psychedcms/admin-translatable';
 import { ContentForm } from './ContentForm.tsx';
-import type { TranslatableSaveHandle } from './TranslatableFormManager.tsx';
+import type { TranslatableSaveHandle } from '@psychedcms/admin-translatable';
 
 const entrypoint = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 

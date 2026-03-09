@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useLocation, Link } from 'react-router-dom';
-import { useSidebarState } from 'react-admin';
+import { useLocation } from 'react-router-dom';
+import { useSidebarState, useTranslate } from 'react-admin';
 import {
   List,
   ListItemButton,
@@ -9,21 +9,23 @@ import {
   Collapse,
 } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
-import PublicIcon from '@mui/icons-material/Public';
-import TuneIcon from '@mui/icons-material/Tune';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 
-const SETTINGS_PATHS = ['/settings/global', '/settings/preferences'];
+import { SettingsMenuSlot, getSettingsPages } from '@psychedcms/admin-core';
 
 /**
- * Collapsible settings menu with Global and Preferences sub-items.
+ * Collapsible settings menu with plugin-contributed sub-items.
  * Auto-expands when the current route is under /settings/.
  */
 export function SettingsMenu() {
   const location = useLocation();
   const [sidebarOpen] = useSidebarState();
-  const isActive = SETTINGS_PATHS.some((p) => location.pathname.startsWith(p));
+  const translate = useTranslate();
+
+  const pages = getSettingsPages();
+  const settingsPaths = pages.map((p) => `/settings/${p.path}`);
+  const isActive = settingsPaths.some((p) => location.pathname.startsWith(p));
   const [open, setOpen] = useState(isActive);
 
   return (
@@ -42,7 +44,7 @@ export function SettingsMenu() {
         {sidebarOpen && (
           <>
             <ListItemText
-              primary="Settings"
+              primary={translate('psyched.menu.settings', { _: 'Settings' })}
               primaryTypographyProps={{ fontSize: '0.875rem' }}
             />
             {open ? <ExpandLess fontSize="small" /> : <ExpandMore fontSize="small" />}
@@ -52,54 +54,9 @@ export function SettingsMenu() {
 
       <Collapse in={open && sidebarOpen} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
-          <SettingsSubItem
-            to="/settings/global"
-            label="Global"
-            icon={<PublicIcon fontSize="small" />}
-            active={location.pathname === '/settings/global'}
-          />
-          <SettingsSubItem
-            to="/settings/preferences"
-            label="Preferences"
-            icon={<TuneIcon fontSize="small" />}
-            active={location.pathname === '/settings/preferences'}
-          />
+          <SettingsMenuSlot />
         </List>
       </Collapse>
     </List>
-  );
-}
-
-function SettingsSubItem({
-  to,
-  label,
-  icon,
-  active,
-}: {
-  to: string;
-  label: string;
-  icon: React.ReactNode;
-  active: boolean;
-}) {
-  return (
-    <ListItemButton
-      component={Link}
-      to={to}
-      sx={{
-        pl: 4,
-        minHeight: 36,
-        color: active ? 'primary.main' : 'text.primary',
-        bgcolor: active ? 'action.selected' : 'transparent',
-        '&:hover': { bgcolor: 'action.hover' },
-      }}
-    >
-      <ListItemIcon sx={{ minWidth: 32, color: 'inherit' }}>
-        {icon}
-      </ListItemIcon>
-      <ListItemText
-        primary={label}
-        primaryTypographyProps={{ fontSize: '0.8125rem' }}
-      />
-    </ListItemButton>
   );
 }

@@ -8,8 +8,7 @@ import {
   Alert,
 } from '@mui/material';
 import ScheduleIcon from '@mui/icons-material/Schedule';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { useTranslate } from 'react-admin';
 import { StaticDateTimePicker } from '@mui/x-date-pickers/StaticDateTimePicker';
 import dayjs, { Dayjs } from 'dayjs';
 
@@ -41,6 +40,7 @@ export function ScheduleDialog({ open, onClose, onConfirm, loading }: ScheduleDi
     return now.add(1, 'hour').minute(roundedMinutes).second(0);
   }, []);
 
+  const translate = useTranslate();
   const [scheduledAt, setScheduledAt] = useState<Dayjs>(defaultDateTime);
   const [error, setError] = useState<string | null>(null);
 
@@ -48,7 +48,7 @@ export function ScheduleDialog({ open, onClose, onConfirm, loading }: ScheduleDi
 
   const handleConfirm = () => {
     if (scheduledAt.isBefore(dayjs())) {
-      setError('Scheduled date must be in the future');
+      setError(translate('psyched.schedule_dialog.error_future', { _: 'Scheduled date must be in the future' }));
       return;
     }
 
@@ -66,7 +66,7 @@ export function ScheduleDialog({ open, onClose, onConfirm, loading }: ScheduleDi
     <Dialog open={open} onClose={handleClose} maxWidth="xs">
       <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
         <ScheduleIcon color="warning" />
-        Schedule Publication
+        {translate('psyched.schedule_dialog.title', { _: 'Schedule Publication' })}
       </DialogTitle>
       <DialogContent sx={{ p: 0 }}>
         {error && (
@@ -74,26 +74,24 @@ export function ScheduleDialog({ open, onClose, onConfirm, loading }: ScheduleDi
             {error}
           </Alert>
         )}
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <StaticDateTimePicker
-            value={scheduledAt}
-            onChange={(newValue) => {
-              if (newValue) {
-                setScheduledAt(newValue);
-                setError(null);
-              }
-            }}
-            minDateTime={minDateTime}
-            ampm={false}
-            slotProps={{
-              actionBar: { actions: [] },
-            }}
-          />
-        </LocalizationProvider>
+        <StaticDateTimePicker
+          value={scheduledAt}
+          onChange={(newValue) => {
+            if (newValue) {
+              setScheduledAt(newValue);
+              setError(null);
+            }
+          }}
+          minDateTime={minDateTime}
+          ampm={false}
+          slotProps={{
+            actionBar: { actions: [] },
+          }}
+        />
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose} disabled={loading}>
-          Cancel
+          {translate('psyched.schedule_dialog.cancel', { _: 'Cancel' })}
         </Button>
         <Button
           onClick={handleConfirm}
@@ -101,7 +99,7 @@ export function ScheduleDialog({ open, onClose, onConfirm, loading }: ScheduleDi
           color="warning"
           disabled={loading || !scheduledAt}
         >
-          {loading ? 'Scheduling...' : 'Schedule'}
+          {loading ? translate('psyched.schedule_dialog.scheduling', { _: 'Scheduling...' }) : translate('psyched.schedule_dialog.confirm', { _: 'Schedule' })}
         </Button>
       </DialogActions>
     </Dialog>

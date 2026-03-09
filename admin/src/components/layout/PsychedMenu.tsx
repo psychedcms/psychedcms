@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { MenuItemLink, useResourceDefinitions, useSidebarState } from 'react-admin';
+import { MenuItemLink, useResourceDefinitions, useSidebarState, useTranslate } from 'react-admin';
 import { Box, Typography, Divider } from '@mui/material';
 
 import { useContentTypes } from '../../hooks/index.ts';
@@ -16,6 +16,7 @@ export function PsychedMenu() {
   const [open] = useSidebarState();
   const resources = useResourceDefinitions();
   const contentTypes = useContentTypes();
+  const translate = useTranslate();
 
   const contentTypeNames = useMemo(
     () => new Set(contentTypes.map((ct) => ct.name)),
@@ -60,14 +61,15 @@ export function PsychedMenu() {
     >
       {contentResources.length > 0 && (
         <>
-          <SectionHeader title="Content" open={open} />
+          <SectionHeader title={translate('psyched.menu.content', { _: 'Content' })} open={open} />
           {contentResources.map((resourceName) => {
             const ct = contentTypeMap.get(resourceName);
+            const label = translate(`resources.${resourceName}.name`, { _: ct?.contentType?.name ?? capitalize(resourceName) });
             return (
               <MenuItemLink
                 key={resourceName}
                 to={`/${resourceName}`}
-                primaryText={ct?.contentType?.name ?? resourceName}
+                primaryText={label}
                 leftIcon={<MenuIcon name={ct?.contentType?.icon ?? null} />}
               />
             );
@@ -78,15 +80,18 @@ export function PsychedMenu() {
       {adminResources.length > 0 && (
         <>
           {contentResources.length > 0 && <Divider sx={{ my: 1 }} />}
-          <SectionHeader title="Admin" open={open} />
-          {adminResources.map((resourceName) => (
-            <MenuItemLink
-              key={resourceName}
-              to={`/${resourceName}`}
-              primaryText={capitalize(resourceName)}
-              leftIcon={<MenuIcon name={getAdminIcon(resourceName)} />}
-            />
-          ))}
+          <SectionHeader title={translate('psyched.menu.admin', { _: 'Admin' })} open={open} />
+          {adminResources.map((resourceName) => {
+            const label = translate(`resources.${resourceName}.name`, { _: capitalize(resourceName) });
+            return (
+              <MenuItemLink
+                key={resourceName}
+                to={`/${resourceName}`}
+                primaryText={label}
+                leftIcon={<MenuIcon name={getAdminIcon(resourceName)} />}
+              />
+            );
+          })}
         </>
       )}
 

@@ -11,24 +11,33 @@ import StarIcon from '@mui/icons-material/Star';
 import {
   useRecordContext,
   SelectInput,
-  DateTimeInput,
   ReferenceInput,
   AutocompleteInput,
   SaveButton,
   DeleteButton,
   useResourceContext,
+  useTranslate,
+  useLocaleState,
 } from 'react-admin';
+import { useController } from 'react-hook-form';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { renderTimeViewClock } from '@mui/x-date-pickers/timeViewRenderers';
+import dayjs, { type Dayjs } from 'dayjs';
 import { formatDistanceToNow } from 'date-fns';
+import { fr } from 'date-fns/locale/fr';
 import { WorkflowButton } from './WorkflowButton.tsx';
-import { LocaleSwitcher } from './LocaleSwitcher.tsx';
+import { SidebarSlot } from '@psychedcms/admin-core';
 
-const statusChoices = [
-  { id: 'draft', name: 'Draft' },
-  { id: 'review', name: 'In Review' },
-  { id: 'scheduled', name: 'Scheduled' },
-  { id: 'published', name: 'Published' },
-  { id: 'archived', name: 'Archived' },
-];
+function useStatusChoices() {
+  const translate = useTranslate();
+  return [
+    { id: 'draft', name: translate('psyched.status.draft', { _: 'Draft' }) },
+    { id: 'review', name: translate('psyched.status.review', { _: 'In Review' }) },
+    { id: 'scheduled', name: translate('psyched.status.scheduled', { _: 'Scheduled' }) },
+    { id: 'published', name: translate('psyched.status.published', { _: 'Published' }) },
+    { id: 'archived', name: translate('psyched.status.archived', { _: 'Archived' }) },
+  ];
+}
 
 const statusColors: Record<string, 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning'> = {
   draft: 'default',
@@ -38,17 +47,44 @@ const statusColors: Record<string, 'default' | 'primary' | 'secondary' | 'error'
   archived: 'error',
 };
 
-function formatDateWithRelative(date: string | Date | undefined): string | null {
+const dateFnsLocales: Record<string, Locale> = { fr };
+
+const clockRenderers = {
+  hours: renderTimeViewClock,
+  minutes: renderTimeViewClock,
+  seconds: renderTimeViewClock,
+};
+
+function FormDateTimePicker({ source, label }: { source: string; label: string }) {
+  const { field } = useController({ name: source });
+  const value = field.value ? dayjs(field.value) : null;
+
+  return (
+    <DateTimePicker
+      label={label}
+      value={value}
+      onChange={(v) => field.onChange(v ? v.toISOString() : null)}
+      viewRenderers={clockRenderers}
+      ampm={false}
+      slotProps={{
+        textField: { size: 'small', fullWidth: true, helperText: ' ' },
+        field: { clearable: true, onClear: () => field.onChange(null) },
+      }}
+    />
+  );
+}
+
+function formatDateWithRelative(date: string | Date | undefined, uiLocale: string): string | null {
   if (!date) return null;
   const d = new Date(date);
-  const formatted = d.toLocaleDateString('en-US', {
+  const formatted = d.toLocaleDateString(uiLocale, {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
   });
-  const relative = formatDistanceToNow(d, { addSuffix: true });
+  const relative = formatDistanceToNow(d, { addSuffix: true, locale: dateFnsLocales[uiLocale] });
   return `${formatted} (${relative})`;
 }
 
@@ -63,6 +99,9 @@ export function EditSidebar({ resource: resourceProp }: EditSidebarProps) {
   const record = useRecordContext();
   const resourceFromContext = useResourceContext();
   const resource = resourceProp ?? resourceFromContext;
+  const translate = useTranslate();
+  const [uiLocale] = useLocaleState();
+  const statusChoices = useStatusChoices();
 
   if (!record) {
     return null;
@@ -78,7 +117,7 @@ export function EditSidebar({ resource: resourceProp }: EditSidebarProps) {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
             <StarIcon fontSize="small" color="primary" />
             <Typography variant="subtitle2" fontWeight="bold">
-              Primary Actions
+              {translate('psyched.sidebar.primary_actions', { _: 'Primary Actions' })}
             </Typography>
           </Box>
 
@@ -90,10 +129,10 @@ export function EditSidebar({ resource: resourceProp }: EditSidebarProps) {
           {status && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
               <Typography variant="body2" color="text.secondary">
-                Current status:
+                {translate('psyched.sidebar.current_status', { _: 'Current status:' })}
               </Typography>
               <Chip
-                label={status.charAt(0).toUpperCase() + status.slice(1)}
+                label={translate(`psyched.status.${status}`, { _: status.charAt(0).toUpperCase() + status.slice(1) })}
                 color={statusColors[status] ?? 'default'}
                 size="small"
               />
@@ -102,7 +141,7 @@ export function EditSidebar({ resource: resourceProp }: EditSidebarProps) {
 
           {record.updatedAt && (
             <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 2 }}>
-              Modified: {formatDateWithRelative(record.updatedAt)}
+              {translate('psyched.metadata.modified', { _: 'Modified:' })} {formatDateWithRelative(record.updatedAt, uiLocale)}
             </Typography>
           )}
 
@@ -114,8 +153,8 @@ export function EditSidebar({ resource: resourceProp }: EditSidebarProps) {
         </CardContent>
       </Card>
 
-      {/* Language Switcher - self-contained, renders nothing if not applicable */}
-      <LocaleSwitcher />
+      {/* Plugin sidebar widgets (e.g. LocaleSwitcher) */}
+      <SidebarSlot resource={resource} />
 
       {/* Options - always show for workflow-aware content */}
       <Card variant="outlined">
@@ -123,7 +162,7 @@ export function EditSidebar({ resource: resourceProp }: EditSidebarProps) {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
             <SettingsIcon fontSize="small" />
             <Typography variant="subtitle2" fontWeight="bold">
-              Options
+              {translate('psyched.sidebar.options', { _: 'Options' })}
             </Typography>
           </Box>
 
@@ -131,32 +170,26 @@ export function EditSidebar({ resource: resourceProp }: EditSidebarProps) {
             <SelectInput
               source="status"
               choices={statusChoices}
-              label="Status"
+              label={translate('psyched.fields.status', { _: 'Status' })}
               fullWidth
               helperText={false}
               size="small"
             />
 
-            <DateTimeInput
+            <FormDateTimePicker
               source="publishedAt"
-              label="Published at"
-              fullWidth
-              helperText={false}
-              size="small"
+              label={translate('psyched.fields.published_at', { _: 'Published at' })}
             />
 
-            <DateTimeInput
+            <FormDateTimePicker
               source="depublishedAt"
-              label="Depublished at"
-              fullWidth
-              helperText={false}
-              size="small"
+              label={translate('psyched.fields.depublished_at', { _: 'Depublished at' })}
             />
 
             {resource === 'posts' && (
               <ReferenceInput source="author" reference="users">
                 <AutocompleteInput
-                  label="Author"
+                  label={translate('psyched.fields.author', { _: 'Author' })}
                   optionText="email"
                   fullWidth
                   helperText={false}
@@ -174,17 +207,17 @@ export function EditSidebar({ resource: resourceProp }: EditSidebarProps) {
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.25 }}>
             {record.createdAt && (
               <Typography variant="caption" color="text.secondary">
-                <strong>Created:</strong> {formatDateWithRelative(record.createdAt)}
+                <strong>{translate('psyched.metadata.created', { _: 'Created:' })}</strong> {formatDateWithRelative(record.createdAt, uiLocale)}
               </Typography>
             )}
             {record.updatedAt && (
               <Typography variant="caption" color="text.secondary">
-                <strong>Modified:</strong> {formatDateWithRelative(record.updatedAt)}
+                <strong>{translate('psyched.metadata.modified', { _: 'Modified:' })}</strong> {formatDateWithRelative(record.updatedAt, uiLocale)}
               </Typography>
             )}
             {record.id && (
               <Typography variant="caption" color="text.secondary">
-                <strong>ID:</strong> {String(record.id)}
+                <strong>{translate('psyched.metadata.id', { _: 'ID:' })}</strong> {String(record.id)}
               </Typography>
             )}
           </Box>

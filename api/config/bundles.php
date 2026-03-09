@@ -12,6 +12,7 @@ return [
     PsychedCms\Media\PsychedCmsMediaBundle::class => ['all' => true],
     PsychedCms\Taxonomy\PsychedCmsTaxonomyBundle::class => ['all' => true],
     PsychedCms\Workflow\PsychedCmsWorkflowBundle::class => ['all' => true],
+    PsychedCms\Translatable\PsychedCmsTranslatableBundle::class => ['all' => true],
     Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle::class => ['dev' => true, 'test' => true],
     League\FlysystemBundle\FlysystemBundle::class => ['all' => true],
 ];

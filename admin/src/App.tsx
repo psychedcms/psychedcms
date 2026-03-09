@@ -1,19 +1,62 @@
 import { useEffect, useState, useMemo } from 'react';
 import { HydraAdmin, hydraDataProvider, ResourceGuesser } from '@api-platform/admin';
 import { CustomRoutes } from 'react-admin';
-import { Route } from 'react-router-dom';
 import type { Resource } from '@api-platform/api-doc-parser';
 
+import { freezeRegistry, AppWrapperSlot, renderSettingsRoutes } from '@psychedcms/admin-core';
+
+// Register plugins — side-effect imports trigger registerPlugin()
+import '@psychedcms/admin-translatable';
+import { useLocaleSettings, getCurrentEditLocale } from '@psychedcms/admin-translatable';
+
 import { PsychedSchemaProvider } from './providers/PsychedSchemaProvider.tsx';
-import { EditLocaleProvider } from './providers/EditLocaleContext.tsx';
-import { localeHttpClient } from './providers/localeHttpClient.ts';
-import { useLocaleSettings } from './hooks/useLocaleSettings.ts';
 import { createI18nProvider } from './providers/i18nProvider.ts';
 import { PsychedLayout } from './components/layout/index.ts';
-import { GlobalSettings, PreferencesSettings } from './components/settings/index.ts';
 import { PsychedCreateGuesser, PsychedEditGuesser, PsychedShowGuesser, PsychedListGuesser, TaxonomyList, GenreList, GenreCreate, GenreEdit, MediaList, MediaEdit } from './components/forms/index.ts';
 
+import { fetchHydra } from '@api-platform/admin';
+import type { HttpClientOptions, HydraHttpClientResponse } from '@api-platform/admin';
+
+// Freeze registry before any rendering
+freezeRegistry();
+
 const entrypoint = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+
+// Read the UI locale from react-admin's store (set by the app bar toggle).
+function getUiLocale(): string {
+  try {
+    const stored = localStorage.getItem('RaStore.locale');
+    if (stored) return JSON.parse(stored) as string;
+  } catch { /* ignore */ }
+  return 'fr';
+}
+
+// Build the HTTP client by composing plugin middleware over fetchHydra.
+// - Detail requests (edit/show): use the content editing locale, no fallback
+// - Collection requests (lists): use the UI locale, with fallback
+function localeHttpClient(
+  url: URL,
+  options: HttpClientOptions = {},
+): Promise<HydraHttpClientResponse> {
+  const headers = options.headers instanceof Headers
+    ? options.headers
+    : new Headers(options.headers as HeadersInit | undefined);
+
+  // Detail = /api/{resource}/{id} where the last segment is a numeric or UUID id
+  const segments = url.pathname.replace(/\/$/, '').split('/').filter(Boolean);
+  const lastSegment = segments[segments.length - 1] ?? '';
+  const isDetail = segments.length >= 3 && segments[0] === 'api'
+    && /^[\da-f-]+$/i.test(lastSegment);
+
+  if (isDetail) {
+    headers.set('Accept-Language', getCurrentEditLocale());
+    headers.set('X-No-Translation-Fallback', '1');
+  } else {
+    headers.set('Accept-Language', getUiLocale());
+  }
+
+  return fetchHydra(url, { ...options, headers });
+}
 
 const dataProvider = hydraDataProvider({
   entrypoint,
@@ -68,8 +111,7 @@ function PsychedAdmin({ i18nProvider }: { i18nProvider: ReturnType<typeof create
           />
         ))}
       <CustomRoutes>
-        <Route path="/settings/global" element={<GlobalSettings />} />
-        <Route path="/settings/preferences" element={<PreferencesSettings />} />
+        {renderSettingsRoutes()}
       </CustomRoutes>
     </HydraAdmin>
   );
@@ -94,9 +136,9 @@ function App() {
 
   return (
     <PsychedSchemaProvider entrypoint={entrypoint}>
-      <EditLocaleProvider defaultLocale={defaultLocale}>
+      <AppWrapperSlot>
         <PsychedAdmin i18nProvider={i18nProvider} />
-      </EditLocaleProvider>
+      </AppWrapperSlot>
     </PsychedSchemaProvider>
   );
 }

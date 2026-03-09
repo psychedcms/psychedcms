@@ -68,6 +68,7 @@ services:
         GID: ${GID:-1000}
     volumes:
       - ./admin:/var/www/admin:cached
+      - ./packages:/var/www/packages:cached
     environment:
       VITE_API_URL: ${VITE_API_URL}
     ports:
