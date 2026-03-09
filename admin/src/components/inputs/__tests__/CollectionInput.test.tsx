@@ -44,7 +44,7 @@ describe('CollectionInput', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Add item')).toBeDefined();
+      expect(screen.getByRole('button', { name: /add/i })).toBeDefined();
     });
   });
 
@@ -77,11 +77,8 @@ describe('CollectionInput', () => {
       </Wrapper>,
     );
 
-    await waitFor(() => {
-      expect(screen.getByText('Add item')).toBeDefined();
-    });
-
-    fireEvent.click(screen.getByText('Add item'));
+    const addButton = await screen.findByRole('button', { name: /add/i });
+    fireEvent.click(addButton);
 
     await waitFor(() => {
       expect(screen.getByLabelText('Remove item')).toBeDefined();
@@ -124,8 +121,8 @@ describe('CollectionInput', () => {
     );
 
     await waitFor(() => {
-      const addButton = screen.getByText('Add item').closest('button');
-      expect(addButton?.disabled).toBe(true);
+      const addButton = screen.getByRole('button', { name: /add/i });
+      expect(addButton.hasAttribute('disabled')).toBe(true);
     });
   });
 

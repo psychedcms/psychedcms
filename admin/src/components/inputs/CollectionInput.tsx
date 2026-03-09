@@ -1,4 +1,4 @@
-import { useInput } from 'react-admin';
+import { useInput, useTranslate } from 'react-admin';
 import { useCallback } from 'react';
 import {
   Box,
@@ -174,6 +174,7 @@ export function CollectionInput({
   max = 0,
   sortable = true,
 }: CollectionInputProps) {
+  const translate = useTranslate();
   const {
     field,
     fieldState: { error },
@@ -296,7 +297,7 @@ export function CollectionInput({
         onClick={handleAdd}
         disabled={!canAdd}
       >
-        Add item
+        {translate('ra.action.add', { _: 'Add' })}
       </Button>
 
       {error && (
