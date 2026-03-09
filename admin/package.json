@@ -16,6 +16,8 @@
     "@psychedcms/admin-core": "file:../packages/admin-core",
     "@psychedcms/admin-translatable": "file:../packages/admin-translatable",
     "@api-platform/admin": "^4.0.8",
+    "@psychedcms/admin-geolocation": "file:../packages/admin-geolocation",
+    "@vis.gl/react-google-maps": "^1.0.0",
     "@mui/x-date-pickers": "^8.26.0",
     "@tiptap/extension-link": "^3.17.1",
     "@tiptap/pm": "^3.17.1",

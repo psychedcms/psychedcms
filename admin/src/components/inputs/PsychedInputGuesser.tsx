@@ -1,6 +1,7 @@
 import {
   useResourceContext,
   TextInput,
+  DateTimeInput,
   SelectInput,
   SelectArrayInput,
   AutocompleteInput,
@@ -75,6 +76,10 @@ export function PsychedInputGuesser({
   const adornmentProps = buildInputAdornments(fieldMetadata);
   if (adornmentProps) {
     Object.assign(baseProps, adornmentProps);
+  }
+
+  if (type === 'date' && fieldMetadata.mode === 'datetime') {
+    return <DateTimeInput {...baseProps} />;
   }
 
   if (type === 'select') {

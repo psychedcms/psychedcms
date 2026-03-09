@@ -218,6 +218,79 @@ describe('PsychedInputGuesser', () => {
     });
   });
 
+  it('renders DateTimeInput when date field has mode datetime', async () => {
+    const schemaWithDateTime: PsychedSchema = {
+      resources: new Map([
+        [
+          'events',
+          {
+            name: 'events',
+            contentType: null,
+            fields: new Map([
+              [
+                'startsAt',
+                {
+                  type: 'date',
+                  label: 'Starts At',
+                  mode: 'datetime',
+                },
+              ],
+            ]),
+          },
+        ],
+      ]),
+    };
+
+    const Wrapper = createFormWrapper(schemaWithDateTime, 'events', { startsAt: '' });
+
+    render(
+      <Wrapper>
+        <PsychedInputGuesser source="startsAt" />
+      </Wrapper>
+    );
+
+    await waitFor(() => {
+      const input = screen.getByLabelText('Starts At');
+      expect(input).toBeDefined();
+    });
+  });
+
+  it('renders DateInput when date field has no mode', async () => {
+    const schemaWithDate: PsychedSchema = {
+      resources: new Map([
+        [
+          'events',
+          {
+            name: 'events',
+            contentType: null,
+            fields: new Map([
+              [
+                'publishedOn',
+                {
+                  type: 'date',
+                  label: 'Published On',
+                },
+              ],
+            ]),
+          },
+        ],
+      ]),
+    };
+
+    const Wrapper = createFormWrapper(schemaWithDate, 'events', { publishedOn: '' });
+
+    render(
+      <Wrapper>
+        <PsychedInputGuesser source="publishedOn" />
+      </Wrapper>
+    );
+
+    await waitFor(() => {
+      const input = screen.getByLabelText('Published On');
+      expect(input).toBeDefined();
+    });
+  });
+
   it('falls back to TextInput for unknown types', async () => {
     const schemaWithUnknown: PsychedSchema = {
       resources: new Map([

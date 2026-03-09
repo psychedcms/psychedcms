@@ -23,6 +23,7 @@ import { ImageListInput } from '../components/inputs/ImageListInput.tsx';
 import { FileListInput } from '../components/inputs/FileListInput.tsx';
 import { CollectionInput } from '../components/inputs/CollectionInput.tsx';
 import { RelationInput } from '../components/inputs/RelationInput.tsx';
+import { GeolocationInput } from '@psychedcms/admin-geolocation';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyComponent = ComponentType<any>;
@@ -70,6 +71,12 @@ const fieldTypeMappings: Record<FieldType, FieldTypeConfig> = {
       type: 'email',
     },
   },
+  url: {
+    component: TextInput as AnyComponent,
+    defaultProps: {
+      type: 'url',
+    },
+  },
   select: {
     component: SelectInput as AnyComponent,
   },
@@ -99,6 +106,9 @@ const fieldTypeMappings: Record<FieldType, FieldTypeConfig> = {
   },
   collection: {
     component: CollectionInput as AnyComponent,
+  },
+  geolocation: {
+    component: GeolocationInput as AnyComponent,
   },
   hidden: {
     component: (() => null) as AnyComponent,

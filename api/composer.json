@@ -20,6 +20,13 @@
         },
         {
             "type": "path",
+            "url": "../packages/psychedcms-geolocation",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
             "url": "../packages/psychedcms-media",
             "options": {
                 "symlink": true
@@ -61,6 +68,7 @@
         "nelmio/cors-bundle": "^2.6.1",
         "psychedcms/psychedcms-calendar": "@dev",
         "psychedcms/psychedcms-core": "@dev",
+        "psychedcms/psychedcms-geolocation": "@dev",
         "psychedcms/psychedcms-media": "@dev",
         "psychedcms/psychedcms-taxonomy": "@dev",
         "psychedcms/psychedcms-translatable": "@dev",
@@ -101,6 +109,7 @@
             "App\\Tests\\": "tests/",
             "PsychedCms\\Calendar\\Tests\\": "../packages/psychedcms-calendar/tests/",
             "PsychedCms\\Core\\Tests\\": "../packages/psychedcms-core/tests/",
+            "PsychedCms\\Geolocation\\Tests\\": "../packages/psychedcms-geolocation/tests/",
             "PsychedCms\\Media\\Tests\\": "../packages/psychedcms-media/tests/",
             "PsychedCms\\Taxonomy\\Tests\\": "../packages/psychedcms-taxonomy/tests/",
             "PsychedCms\\Translatable\\Tests\\": "../packages/psychedcms-translatable/tests/",

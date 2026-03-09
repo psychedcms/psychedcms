@@ -17,6 +17,7 @@ export interface ContentTypeMetadata {
   defaultStatus: string;
   searchable: boolean;
   singleton: boolean;
+  viewless?: boolean;
   locales: string[];
 }
 
@@ -32,6 +33,7 @@ export type FieldType =
   | 'checkbox'
   | 'date'
   | 'email'
+  | 'url'
   | 'select'
   | 'slug'
   | 'hidden'
@@ -43,6 +45,7 @@ export type FieldType =
   | 'imagelist'
   | 'filelist'
   | 'collection'
+  | 'geolocation'
   | 'field';
 
 /**
@@ -68,6 +71,8 @@ export interface FieldMetadata {
   translatable?: boolean;
   sanitise?: boolean;
   allowHtml?: boolean;
+  // DateField extras
+  mode?: string;
   // SelectField extras
   values?: string[] | Record<string, string>;
   multiple?: boolean;
@@ -97,6 +102,11 @@ export interface FieldMetadata {
   thumbnailHeight?: number;
   // CollectionField extras
   schema?: Record<string, string | { type: string; values?: string[] | Record<string, string> }>;
+  // GeolocationField extras
+  provider?: string;
+  defaultZoom?: number;
+  defaultLat?: number;
+  defaultLng?: number;
 }
 
 /**
