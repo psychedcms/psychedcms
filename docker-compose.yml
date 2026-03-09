@@ -25,8 +25,6 @@ services:
       MERCURE_PUBLIC_URL: ${MERCURE_PUBLIC_URL}
       MERCURE_JWT_SECRET: ${MERCURE_JWT_SECRET}
       MESSENGER_TRANSPORT_DSN: ${MESSENGER_TRANSPORT_DSN}
-      IMGPROXY_URL: ${IMGPROXY_URL:-}
-      MEDIA_PUBLIC_URL: ${MEDIA_PUBLIC_URL:-}
     depends_on:
       database:
         condition: service_healthy
@@ -46,6 +44,7 @@ services:
       - "${NGINX_PORT}:80"
     volumes:
       - ./api/public:/var/www/api/public:ro
+      - ./api/var/storage/media:/var/www/api/var/storage/media:ro
       - ./admin/dist:/var/www/admin:ro
     environment:
       APP_DOMAIN: ${APP_DOMAIN}

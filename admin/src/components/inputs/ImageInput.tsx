@@ -1,5 +1,5 @@
 import { useInput, useDataProvider, useNotify } from 'react-admin';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -45,6 +45,42 @@ export function ImageInput({
     altText?: string;
     originalFilename?: string;
   } | null>(null);
+
+  // Load preview when field has an existing value (IRI or resolved object)
+  useEffect(() => {
+    if (preview) return; // Already have preview data
+
+    const value = field.value;
+    if (!value) return;
+
+    // Hydra data provider may resolve IRI to a nested object
+    if (typeof value === 'object' && value['@id']) {
+      setPreview({
+        url: value.url,
+        thumbnailUrl: value.thumbnailUrl,
+        altText: value.altText,
+        originalFilename: value.originalFilename,
+      });
+      return;
+    }
+
+    // Value is an IRI string - fetch media data
+    if (typeof value === 'string' && value.startsWith('/api/media/')) {
+      dataProvider
+        .getOne('media', { id: value })
+        .then(({ data }) => {
+          setPreview({
+            url: data.url,
+            thumbnailUrl: data.thumbnailUrl,
+            altText: data.altText,
+            originalFilename: data.originalFilename,
+          });
+        })
+        .catch(() => {
+          // Media may have been deleted
+        });
+    }
+  }, [field.value, preview, dataProvider]);
 
   const handleUpload = useCallback(
     async (event: React.ChangeEvent<HTMLInputElement>) => {

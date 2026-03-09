@@ -33,6 +33,15 @@ server {
         try_files $uri =404;
     }
 
+    # ==========================================================================
+    # Media files - serve from local Flysystem storage (dev fallback)
+    # ==========================================================================
+    location /media/ {
+        alias /var/www/api/var/storage/media/;
+        expires 30d;
+        add_header Cache-Control "public";
+    }
+
     # PHP-FPM handling
     location ~ ^/index\.php(/|$) {
         fastcgi_pass php-upstream;

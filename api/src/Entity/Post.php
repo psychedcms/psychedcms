@@ -15,6 +15,8 @@ use PsychedCms\Core\Attribute\Field\HtmlField;
 use PsychedCms\Core\Attribute\Field\TextareaField;
 use PsychedCms\Core\Attribute\Field\TextField;
 use PsychedCms\Core\Content\ContentTrait;
+use PsychedCms\Media\Attribute\ImageField;
+use PsychedCms\Media\Entity\Media;
 use PsychedCms\Taxonomy\Attribute\EntityTaxonomyField;
 use PsychedCms\Taxonomy\Attribute\TaxonomyField;
 use PsychedCms\Taxonomy\Entity\Taxonomy;
@@ -47,6 +49,11 @@ class Post implements PublicationWorkflowAwareInterface
     #[ORM\Column(type: 'text', nullable: true)]
     #[HtmlField(label: 'Content', group: 'content')]
     private ?string $content = null;
+
+    #[ORM\ManyToOne(targetEntity: Media::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    #[ImageField(label: 'Featured Image', group: 'media')]
+    private ?Media $featuredImage = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: true)]
@@ -100,6 +107,18 @@ class Post implements PublicationWorkflowAwareInterface
     public function setExcerpt(?string $excerpt): static
     {
         $this->excerpt = $excerpt;
+
+        return $this;
+    }
+
+    public function getFeaturedImage(): ?Media
+    {
+        return $this->featuredImage;
+    }
+
+    public function setFeaturedImage(?Media $featuredImage): static
+    {
+        $this->featuredImage = $featuredImage;
 
         return $this;
     }
