@@ -11,15 +11,10 @@ const customEnMessages = {
       admin: 'Admin',
       settings: 'Settings',
     },
-    settings: {
-      global: 'Global',
-      preferences: 'Preferences',
-    },
     sidebar: {
       primary_actions: 'Primary Actions',
       current_status: 'Current status:',
       options: 'Options',
-      language: 'Language',
     },
     fields: {
       status: 'Status',
@@ -76,15 +71,10 @@ const customFrMessages = {
       admin: 'Administration',
       settings: 'Paramètres',
     },
-    settings: {
-      global: 'Général',
-      preferences: 'Préférences',
-    },
     sidebar: {
       primary_actions: 'Actions principales',
       current_status: 'Statut actuel :',
       options: 'Options',
-      language: 'Langue',
     },
     fields: {
       status: 'Statut',
