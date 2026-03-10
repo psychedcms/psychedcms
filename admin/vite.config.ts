@@ -11,9 +11,10 @@ export default defineConfig({
     alias: {
       '@psychedcms/admin-core': path.resolve(__dirname, '../packages/psychedcms-admin-core/src/index.ts'),
       '@psychedcms/admin-translatable': path.resolve(__dirname, '../packages/psychedcms-admin-translatable/src/index.ts'),
+      '@psychedcms/admin-geolocation': path.resolve(__dirname, '../packages/psychedcms-admin-geolocation/src/index.ts'),
     },
     // Ensure workspace packages resolve their dependencies from admin's node_modules
-    dedupe: ['react', 'react-dom', 'react-admin', '@mui/material', '@mui/icons-material', 'react-router-dom', 'react-hook-form'],
+    dedupe: ['react', 'react-dom', 'react-admin', '@mui/material', '@mui/icons-material', 'react-router-dom', 'react-hook-form', '@vis.gl/react-google-maps'],
   },
   server: {
     allowedHosts: ['psychedcms.local'],
@@ -22,5 +23,8 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
+    deps: {
+      moduleDirectories: ['node_modules', path.resolve(__dirname, 'node_modules')],
+    },
   },
 })

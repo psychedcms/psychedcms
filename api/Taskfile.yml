@@ -471,3 +471,370 @@ tasks:
     cmds:
       - git -C {{.PACKAGES_DIR}}/psychedcms-admin-translatable checkout {{.BRANCH}}
       - git -C {{.PACKAGES_DIR}}/psychedcms-admin-translatable pull origin {{.BRANCH}}
+
+  # ===========================================================================
+  # Git - psychedcms-admin-geolocation (atomic operations)
+  # ===========================================================================
+  git:status:admin-geolocation:
+    desc: Show git status for psychedcms-admin-geolocation
+    cmds:
+      - echo "=== psychedcms-admin-geolocation ===" && git -C {{.PACKAGES_DIR}}/psychedcms-admin-geolocation status -s && git -C {{.PACKAGES_DIR}}/psychedcms-admin-geolocation log -1 --oneline
+
+  git:branch:admin-geolocation:
+    desc: Show current branch for psychedcms-admin-geolocation
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-admin-geolocation branch --show-current
+
+  commit:admin-geolocation:
+    desc: "Commit psychedcms-admin-geolocation on current branch"
+    vars:
+      MESSAGE: '{{.MESSAGE}}'
+    cmds:
+      - cmd: 'git -C {{.PACKAGES_DIR}}/psychedcms-admin-geolocation add .'
+      - cmd: 'git -C {{.PACKAGES_DIR}}/psychedcms-admin-geolocation commit -m "{{.MESSAGE}}"'
+
+  push:admin-geolocation:
+    desc: Push psychedcms-admin-geolocation current branch
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-admin-geolocation push -u origin $(git -C {{.PACKAGES_DIR}}/psychedcms-admin-geolocation branch --show-current)
+
+  pull:admin-geolocation:
+    desc: 'Pull psychedcms-admin-geolocation (current branch or specified via BRANCH=x)'
+    vars:
+      BRANCH:
+        sh: echo "${BRANCH:-$(git -C {{.PACKAGES_DIR}}/psychedcms-admin-geolocation branch --show-current)}"
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-admin-geolocation checkout {{.BRANCH}}
+      - git -C {{.PACKAGES_DIR}}/psychedcms-admin-geolocation pull origin {{.BRANCH}}
+
+  # ===========================================================================
+  # Git - psychedcms-geolocation (atomic operations)
+  # ===========================================================================
+  git:status:geolocation:
+    desc: Show git status for psychedcms-geolocation
+    cmds:
+      - echo "=== psychedcms-geolocation ===" && git -C {{.PACKAGES_DIR}}/psychedcms-geolocation status -s && git -C {{.PACKAGES_DIR}}/psychedcms-geolocation log -1 --oneline
+
+  git:branch:geolocation:
+    desc: Show current branch for psychedcms-geolocation
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-geolocation branch --show-current
+
+  feature:ensure:geolocation:
+    desc: "Ensure feature branch exists on psychedcms-geolocation, create if needed"
+    vars:
+      FEATURE: '{{.FEATURE}}'
+    cmds:
+      - ../scripts/git-ensure-branch.sh {{.PACKAGES_DIR}}/psychedcms-geolocation feature/{{.FEATURE}}
+
+  feature:checkout:geolocation:
+    desc: "Checkout feature branch on psychedcms-geolocation"
+    vars:
+      FEATURE: '{{.FEATURE}}'
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-geolocation checkout feature/{{.FEATURE}}
+
+  commit:geolocation:
+    desc: "Commit psychedcms-geolocation with feature reference (creates branch if needed)"
+    vars:
+      FEATURE: '{{.FEATURE}}'
+      MESSAGE: '{{.MESSAGE}}'
+    cmds:
+      - task: feature:ensure:geolocation
+        vars:
+          FEATURE: '{{.FEATURE}}'
+      - cmd: 'git -C {{.PACKAGES_DIR}}/psychedcms-geolocation add .'
+      - cmd: 'git -C {{.PACKAGES_DIR}}/psychedcms-geolocation commit -m "[feature/{{.FEATURE}}] geolocation: {{.MESSAGE}}"'
+
+  push:geolocation:
+    desc: Push psychedcms-geolocation current branch
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-geolocation push -u origin $(git -C {{.PACKAGES_DIR}}/psychedcms-geolocation branch --show-current)
+
+  pull:geolocation:
+    desc: 'Pull psychedcms-geolocation (current branch or specified via BRANCH=x)'
+    vars:
+      BRANCH:
+        sh: echo "${BRANCH:-$(git -C {{.PACKAGES_DIR}}/psychedcms-geolocation branch --show-current)}"
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-geolocation checkout {{.BRANCH}}
+      - git -C {{.PACKAGES_DIR}}/psychedcms-geolocation pull origin {{.BRANCH}}
+
+  rebase:geolocation:
+    desc: "Rebase current feature branch onto main on psychedcms-geolocation (updates main, rebases, force pushes)"
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-geolocation fetch -p origin main:main
+      - git -C {{.PACKAGES_DIR}}/psychedcms-geolocation rebase main
+      - git -C {{.PACKAGES_DIR}}/psychedcms-geolocation push --force-with-lease origin $(git -C {{.PACKAGES_DIR}}/psychedcms-geolocation branch --show-current)
+
+  feature:merge:geolocation:
+    desc: "Squash merge feature to main on psychedcms-geolocation"
+    vars:
+      FEATURE: '{{.FEATURE}}'
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-geolocation checkout main
+      - git -C {{.PACKAGES_DIR}}/psychedcms-geolocation pull origin main
+      - git -C {{.PACKAGES_DIR}}/psychedcms-geolocation merge --squash feature/{{.FEATURE}}
+      - 'git -C {{.PACKAGES_DIR}}/psychedcms-geolocation commit -m "feat: {{.FEATURE}}"'
+
+  feature:push-merge:geolocation:
+    desc: Push merged main on psychedcms-geolocation
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-geolocation push origin main
+
+  feature:cleanup:geolocation:
+    desc: "Delete feature branch on psychedcms-geolocation (local and remote)"
+    vars:
+      FEATURE: '{{.FEATURE}}'
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-geolocation branch -d feature/{{.FEATURE}} || true
+      - git -C {{.PACKAGES_DIR}}/psychedcms-geolocation push origin --delete feature/{{.FEATURE}} || true
+
+  # ===========================================================================
+  # Git - psychedcms-media (atomic operations)
+  # ===========================================================================
+  git:status:media:
+    desc: Show git status for psychedcms-media
+    cmds:
+      - echo "=== psychedcms-media ===" && git -C {{.PACKAGES_DIR}}/psychedcms-media status -s && git -C {{.PACKAGES_DIR}}/psychedcms-media log -1 --oneline
+
+  git:branch:media:
+    desc: Show current branch for psychedcms-media
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-media branch --show-current
+
+  feature:ensure:media:
+    desc: "Ensure feature branch exists on psychedcms-media, create if needed"
+    vars:
+      FEATURE: '{{.FEATURE}}'
+    cmds:
+      - ../scripts/git-ensure-branch.sh {{.PACKAGES_DIR}}/psychedcms-media feature/{{.FEATURE}}
+
+  feature:checkout:media:
+    desc: "Checkout feature branch on psychedcms-media"
+    vars:
+      FEATURE: '{{.FEATURE}}'
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-media checkout feature/{{.FEATURE}}
+
+  commit:media:
+    desc: "Commit psychedcms-media with feature reference (creates branch if needed)"
+    vars:
+      FEATURE: '{{.FEATURE}}'
+      MESSAGE: '{{.MESSAGE}}'
+    cmds:
+      - task: feature:ensure:media
+        vars:
+          FEATURE: '{{.FEATURE}}'
+      - cmd: 'git -C {{.PACKAGES_DIR}}/psychedcms-media add .'
+      - cmd: 'git -C {{.PACKAGES_DIR}}/psychedcms-media commit -m "[feature/{{.FEATURE}}] media: {{.MESSAGE}}"'
+
+  push:media:
+    desc: Push psychedcms-media current branch
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-media push -u origin $(git -C {{.PACKAGES_DIR}}/psychedcms-media branch --show-current)
+
+  pull:media:
+    desc: 'Pull psychedcms-media (current branch or specified via BRANCH=x)'
+    vars:
+      BRANCH:
+        sh: echo "${BRANCH:-$(git -C {{.PACKAGES_DIR}}/psychedcms-media branch --show-current)}"
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-media checkout {{.BRANCH}}
+      - git -C {{.PACKAGES_DIR}}/psychedcms-media pull origin {{.BRANCH}}
+
+  rebase:media:
+    desc: "Rebase current feature branch onto main on psychedcms-media (updates main, rebases, force pushes)"
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-media fetch -p origin main:main
+      - git -C {{.PACKAGES_DIR}}/psychedcms-media rebase main
+      - git -C {{.PACKAGES_DIR}}/psychedcms-media push --force-with-lease origin $(git -C {{.PACKAGES_DIR}}/psychedcms-media branch --show-current)
+
+  feature:merge:media:
+    desc: "Squash merge feature to main on psychedcms-media"
+    vars:
+      FEATURE: '{{.FEATURE}}'
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-media checkout main
+      - git -C {{.PACKAGES_DIR}}/psychedcms-media pull origin main
+      - git -C {{.PACKAGES_DIR}}/psychedcms-media merge --squash feature/{{.FEATURE}}
+      - 'git -C {{.PACKAGES_DIR}}/psychedcms-media commit -m "feat: {{.FEATURE}}"'
+
+  feature:push-merge:media:
+    desc: Push merged main on psychedcms-media
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-media push origin main
+
+  feature:cleanup:media:
+    desc: "Delete feature branch on psychedcms-media (local and remote)"
+    vars:
+      FEATURE: '{{.FEATURE}}'
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-media branch -d feature/{{.FEATURE}} || true
+      - git -C {{.PACKAGES_DIR}}/psychedcms-media push origin --delete feature/{{.FEATURE}} || true
+
+  # ===========================================================================
+  # Git - psychedcms-taxonomy (atomic operations)
+  # ===========================================================================
+  git:status:taxonomy:
+    desc: Show git status for psychedcms-taxonomy
+    cmds:
+      - echo "=== psychedcms-taxonomy ===" && git -C {{.PACKAGES_DIR}}/psychedcms-taxonomy status -s && git -C {{.PACKAGES_DIR}}/psychedcms-taxonomy log -1 --oneline
+
+  git:branch:taxonomy:
+    desc: Show current branch for psychedcms-taxonomy
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-taxonomy branch --show-current
+
+  feature:ensure:taxonomy:
+    desc: "Ensure feature branch exists on psychedcms-taxonomy, create if needed"
+    vars:
+      FEATURE: '{{.FEATURE}}'
+    cmds:
+      - ../scripts/git-ensure-branch.sh {{.PACKAGES_DIR}}/psychedcms-taxonomy feature/{{.FEATURE}}
+
+  feature:checkout:taxonomy:
+    desc: "Checkout feature branch on psychedcms-taxonomy"
+    vars:
+      FEATURE: '{{.FEATURE}}'
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-taxonomy checkout feature/{{.FEATURE}}
+
+  commit:taxonomy:
+    desc: "Commit psychedcms-taxonomy with feature reference (creates branch if needed)"
+    vars:
+      FEATURE: '{{.FEATURE}}'
+      MESSAGE: '{{.MESSAGE}}'
+    cmds:
+      - task: feature:ensure:taxonomy
+        vars:
+          FEATURE: '{{.FEATURE}}'
+      - cmd: 'git -C {{.PACKAGES_DIR}}/psychedcms-taxonomy add .'
+      - cmd: 'git -C {{.PACKAGES_DIR}}/psychedcms-taxonomy commit -m "[feature/{{.FEATURE}}] taxonomy: {{.MESSAGE}}"'
+
+  push:taxonomy:
+    desc: Push psychedcms-taxonomy current branch
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-taxonomy push -u origin $(git -C {{.PACKAGES_DIR}}/psychedcms-taxonomy branch --show-current)
+
+  pull:taxonomy:
+    desc: 'Pull psychedcms-taxonomy (current branch or specified via BRANCH=x)'
+    vars:
+      BRANCH:
+        sh: echo "${BRANCH:-$(git -C {{.PACKAGES_DIR}}/psychedcms-taxonomy branch --show-current)}"
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-taxonomy checkout {{.BRANCH}}
+      - git -C {{.PACKAGES_DIR}}/psychedcms-taxonomy pull origin {{.BRANCH}}
+
+  rebase:taxonomy:
+    desc: "Rebase current feature branch onto main on psychedcms-taxonomy (updates main, rebases, force pushes)"
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-taxonomy fetch -p origin main:main
+      - git -C {{.PACKAGES_DIR}}/psychedcms-taxonomy rebase main
+      - git -C {{.PACKAGES_DIR}}/psychedcms-taxonomy push --force-with-lease origin $(git -C {{.PACKAGES_DIR}}/psychedcms-taxonomy branch --show-current)
+
+  feature:merge:taxonomy:
+    desc: "Squash merge feature to main on psychedcms-taxonomy"
+    vars:
+      FEATURE: '{{.FEATURE}}'
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-taxonomy checkout main
+      - git -C {{.PACKAGES_DIR}}/psychedcms-taxonomy pull origin main
+      - git -C {{.PACKAGES_DIR}}/psychedcms-taxonomy merge --squash feature/{{.FEATURE}}
+      - 'git -C {{.PACKAGES_DIR}}/psychedcms-taxonomy commit -m "feat: {{.FEATURE}}"'
+
+  feature:push-merge:taxonomy:
+    desc: Push merged main on psychedcms-taxonomy
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-taxonomy push origin main
+
+  feature:cleanup:taxonomy:
+    desc: "Delete feature branch on psychedcms-taxonomy (local and remote)"
+    vars:
+      FEATURE: '{{.FEATURE}}'
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-taxonomy branch -d feature/{{.FEATURE}} || true
+      - git -C {{.PACKAGES_DIR}}/psychedcms-taxonomy push origin --delete feature/{{.FEATURE}} || true
+
+  # ===========================================================================
+  # Git - psychedcms-translatable (atomic operations)
+  # ===========================================================================
+  git:status:translatable:
+    desc: Show git status for psychedcms-translatable
+    cmds:
+      - echo "=== psychedcms-translatable ===" && git -C {{.PACKAGES_DIR}}/psychedcms-translatable status -s && git -C {{.PACKAGES_DIR}}/psychedcms-translatable log -1 --oneline
+
+  git:branch:translatable:
+    desc: Show current branch for psychedcms-translatable
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-translatable branch --show-current
+
+  feature:ensure:translatable:
+    desc: "Ensure feature branch exists on psychedcms-translatable, create if needed"
+    vars:
+      FEATURE: '{{.FEATURE}}'
+    cmds:
+      - ../scripts/git-ensure-branch.sh {{.PACKAGES_DIR}}/psychedcms-translatable feature/{{.FEATURE}}
+
+  feature:checkout:translatable:
+    desc: "Checkout feature branch on psychedcms-translatable"
+    vars:
+      FEATURE: '{{.FEATURE}}'
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-translatable checkout feature/{{.FEATURE}}
+
+  commit:translatable:
+    desc: "Commit psychedcms-translatable with feature reference (creates branch if needed)"
+    vars:
+      FEATURE: '{{.FEATURE}}'
+      MESSAGE: '{{.MESSAGE}}'
+    cmds:
+      - task: feature:ensure:translatable
+        vars:
+          FEATURE: '{{.FEATURE}}'
+      - cmd: 'git -C {{.PACKAGES_DIR}}/psychedcms-translatable add .'
+      - cmd: 'git -C {{.PACKAGES_DIR}}/psychedcms-translatable commit -m "[feature/{{.FEATURE}}] translatable: {{.MESSAGE}}"'
+
+  push:translatable:
+    desc: Push psychedcms-translatable current branch
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-translatable push -u origin $(git -C {{.PACKAGES_DIR}}/psychedcms-translatable branch --show-current)
+
+  pull:translatable:
+    desc: 'Pull psychedcms-translatable (current branch or specified via BRANCH=x)'
+    vars:
+      BRANCH:
+        sh: echo "${BRANCH:-$(git -C {{.PACKAGES_DIR}}/psychedcms-translatable branch --show-current)}"
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-translatable checkout {{.BRANCH}}
+      - git -C {{.PACKAGES_DIR}}/psychedcms-translatable pull origin {{.BRANCH}}
+
+  rebase:translatable:
+    desc: "Rebase current feature branch onto main on psychedcms-translatable (updates main, rebases, force pushes)"
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-translatable fetch -p origin main:main
+      - git -C {{.PACKAGES_DIR}}/psychedcms-translatable rebase main
+      - git -C {{.PACKAGES_DIR}}/psychedcms-translatable push --force-with-lease origin $(git -C {{.PACKAGES_DIR}}/psychedcms-translatable branch --show-current)
+
+  feature:merge:translatable:
+    desc: "Squash merge feature to main on psychedcms-translatable"
+    vars:
+      FEATURE: '{{.FEATURE}}'
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-translatable checkout main
+      - git -C {{.PACKAGES_DIR}}/psychedcms-translatable pull origin main
+      - git -C {{.PACKAGES_DIR}}/psychedcms-translatable merge --squash feature/{{.FEATURE}}
+      - 'git -C {{.PACKAGES_DIR}}/psychedcms-translatable commit -m "feat: {{.FEATURE}}"'
+
+  feature:push-merge:translatable:
+    desc: Push merged main on psychedcms-translatable
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-translatable push origin main
+
+  feature:cleanup:translatable:
+    desc: "Delete feature branch on psychedcms-translatable (local and remote)"
+    vars:
+      FEATURE: '{{.FEATURE}}'
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-translatable branch -d feature/{{.FEATURE}} || true
+      - git -C {{.PACKAGES_DIR}}/psychedcms-translatable push origin --delete feature/{{.FEATURE}} || true
