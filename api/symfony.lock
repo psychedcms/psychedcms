@@ -107,6 +107,9 @@
     "psychedcms/psychedcms-media": {
         "version": "dev-main"
     },
+    "psychedcms/psychedcms-search": {
+        "version": "dev-feature/ci-solution"
+    },
     "psychedcms/psychedcms-taxonomy": {
         "version": "dev-main"
     },

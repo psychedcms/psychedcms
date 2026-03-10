@@ -52,6 +52,13 @@
             "options": {
                 "symlink": true
             }
+        },
+        {
+            "type": "path",
+            "url": "../packages/psychedcms-search",
+            "options": {
+                "symlink": true
+            }
         }
     ],
     "require": {
@@ -72,6 +79,7 @@
         "psychedcms/psychedcms-media": "@dev",
         "psychedcms/psychedcms-taxonomy": "@dev",
         "psychedcms/psychedcms-translatable": "@dev",
+        "psychedcms/psychedcms-search": "@dev",
         "psychedcms/psychedcms-workflow": "@dev",
         "stof/doctrine-extensions-bundle": "^1.15.3",
         "symfony/amqp-messenger": "7.4.*",
@@ -113,6 +121,7 @@
             "PsychedCms\\Media\\Tests\\": "../packages/psychedcms-media/tests/",
             "PsychedCms\\Taxonomy\\Tests\\": "../packages/psychedcms-taxonomy/tests/",
             "PsychedCms\\Translatable\\Tests\\": "../packages/psychedcms-translatable/tests/",
+            "PsychedCms\\Search\\Tests\\": "../packages/psychedcms-search/tests/",
             "PsychedCms\\Workflow\\Tests\\": "../packages/psychedcms-workflow/tests/"
         }
     },

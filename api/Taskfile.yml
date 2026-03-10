@@ -838,3 +838,94 @@ tasks:
     cmds:
       - git -C {{.PACKAGES_DIR}}/psychedcms-translatable branch -d feature/{{.FEATURE}} || true
       - git -C {{.PACKAGES_DIR}}/psychedcms-translatable push origin --delete feature/{{.FEATURE}} || true
+
+  # ===========================================================================
+  # Package Testing - psychedcms-search
+  # ===========================================================================
+  test:search:
+    desc: Run tests for psychedcms-search package
+    cmds:
+      - docker compose -f {{.COMPOSE_FILE}} exec php bin/phpunit {{.PACKAGES_DIR}}/psychedcms-search/tests/
+
+  # ===========================================================================
+  # Git - psychedcms-search (atomic operations)
+  # ===========================================================================
+  git:status:search:
+    desc: Show git status for psychedcms-search
+    cmds:
+      - echo "=== psychedcms-search ===" && git -C {{.PACKAGES_DIR}}/psychedcms-search status -s && git -C {{.PACKAGES_DIR}}/psychedcms-search log -1 --oneline
+
+  git:branch:search:
+    desc: Show current branch for psychedcms-search
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-search branch --show-current
+
+  feature:ensure:search:
+    desc: "Ensure feature branch exists on psychedcms-search, create if needed"
+    vars:
+      FEATURE: '{{.FEATURE}}'
+    cmds:
+      - ../scripts/git-ensure-branch.sh {{.PACKAGES_DIR}}/psychedcms-search feature/{{.FEATURE}}
+
+  feature:checkout:search:
+    desc: "Checkout feature branch on psychedcms-search"
+    vars:
+      FEATURE: '{{.FEATURE}}'
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-search checkout feature/{{.FEATURE}}
+
+  commit:search:
+    desc: "Commit psychedcms-search with feature reference (creates branch if needed)"
+    vars:
+      FEATURE: '{{.FEATURE}}'
+      MESSAGE: '{{.MESSAGE}}'
+    cmds:
+      - task: feature:ensure:search
+        vars:
+          FEATURE: '{{.FEATURE}}'
+      - cmd: 'git -C {{.PACKAGES_DIR}}/psychedcms-search add .'
+      - cmd: 'git -C {{.PACKAGES_DIR}}/psychedcms-search commit -m "[feature/{{.FEATURE}}] search: {{.MESSAGE}}"'
+
+  push:search:
+    desc: Push psychedcms-search current branch
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-search push -u origin $(git -C {{.PACKAGES_DIR}}/psychedcms-search branch --show-current)
+
+  pull:search:
+    desc: 'Pull psychedcms-search (current branch or specified via BRANCH=x)'
+    vars:
+      BRANCH:
+        sh: echo "${BRANCH:-$(git -C {{.PACKAGES_DIR}}/psychedcms-search branch --show-current)}"
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-search checkout {{.BRANCH}}
+      - git -C {{.PACKAGES_DIR}}/psychedcms-search pull origin {{.BRANCH}}
+
+  rebase:search:
+    desc: "Rebase current feature branch onto main on psychedcms-search (updates main, rebases, force pushes)"
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-search fetch -p origin main:main
+      - git -C {{.PACKAGES_DIR}}/psychedcms-search rebase main
+      - git -C {{.PACKAGES_DIR}}/psychedcms-search push --force-with-lease origin $(git -C {{.PACKAGES_DIR}}/psychedcms-search branch --show-current)
+
+  feature:merge:search:
+    desc: "Squash merge feature to main on psychedcms-search"
+    vars:
+      FEATURE: '{{.FEATURE}}'
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-search checkout main
+      - git -C {{.PACKAGES_DIR}}/psychedcms-search pull origin main
+      - git -C {{.PACKAGES_DIR}}/psychedcms-search merge --squash feature/{{.FEATURE}}
+      - 'git -C {{.PACKAGES_DIR}}/psychedcms-search commit -m "feat: {{.FEATURE}}"'
+
+  feature:push-merge:search:
+    desc: Push merged main on psychedcms-search
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-search push origin main
+
+  feature:cleanup:search:
+    desc: "Delete feature branch on psychedcms-search (local and remote)"
+    vars:
+      FEATURE: '{{.FEATURE}}'
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-search branch -d feature/{{.FEATURE}} || true
+      - git -C {{.PACKAGES_DIR}}/psychedcms-search push origin --delete feature/{{.FEATURE}} || true

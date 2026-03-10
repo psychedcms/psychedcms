@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "466761b51ed5a69324118070e9c9b590",
+    "content-hash": "7622c1af3fda81d123fd0f1073602bce",
     "packages": [
         {
             "name": "api-platform/core",
@@ -2677,11 +2677,11 @@
         },
         {
             "name": "psychedcms/psychedcms-calendar",
-            "version": "dev-main",
+            "version": "dev-feature/ci-solution",
             "dist": {
                 "type": "path",
                 "url": "../packages/psychedcms-calendar",
-                "reference": "781a9fd3d745838c34d01dcf3e1728fcfc1a9748"
+                "reference": "98fbbf3d40a7da8dc998fa69193477548420864d"
             },
             "require": {
                 "doctrine/doctrine-bundle": "^2.18",
@@ -2722,7 +2722,7 @@
             "dist": {
                 "type": "path",
                 "url": "../packages/psychedcms-core",
-                "reference": "a4dec60dd65ee19c7d04ebf1d0e466ced7f0fc45"
+                "reference": "04b438f06f40f7d570f4b115690c85105fe0e0df"
             },
             "require": {
                 "api-platform/core": "^4.0",
@@ -2760,11 +2760,11 @@
         },
         {
             "name": "psychedcms/psychedcms-geolocation",
-            "version": "dev-main",
+            "version": "dev-feature/ci-solution",
             "dist": {
                 "type": "path",
                 "url": "../packages/psychedcms-geolocation",
-                "reference": "f62032bee3fee8c6761fc3c86f6cf3b937f637be"
+                "reference": "cc29b5ff88e69a62c79f830c2d63fd5267b0be22"
             },
             "require": {
                 "php": ">=8.2",
@@ -2795,11 +2795,11 @@
         },
         {
             "name": "psychedcms/psychedcms-media",
-            "version": "dev-main",
+            "version": "dev-feature/ci-solution",
             "dist": {
                 "type": "path",
                 "url": "../packages/psychedcms-media",
-                "reference": "381b8aa38f616466b3a030349a30a096d3dbebe9"
+                "reference": "dec068b8bdb8701aac122c04269944be5caa6744"
             },
             "require": {
                 "api-platform/core": "^4.2",
@@ -2840,12 +2840,58 @@
             }
         },
         {
+            "name": "psychedcms/psychedcms-search",
+            "version": "dev-feature/ci-solution",
+            "dist": {
+                "type": "path",
+                "url": "../packages/psychedcms-search",
+                "reference": "8bf5a337b590a1cd79ccb189b85542c4b8d30d04"
+            },
+            "require": {
+                "php": ">=8.2",
+                "psr/log": "^3.0",
+                "psychedcms/psychedcms-core": "@dev",
+                "symfony/console": "^7.4",
+                "symfony/messenger": "^7.4"
+            },
+            "suggest": {
+                "api-platform/core": "Required for CQRS state provider and search endpoints (^4.0)",
+                "doctrine/orm": "Required for entity metadata reading and Doctrine event listener (^3.0)",
+                "elasticsearch/elasticsearch": "Required to connect to Elasticsearch (^8.0)",
+                "gedmo/doctrine-extensions": "Required for translation-aware indexing (^3.0)"
+            },
+            "type": "symfony-bundle",
+            "extra": {
+                "symfony": {
+                    "allow-contrib": false
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "PsychedCms\\Search\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "PsychedCms\\Search\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Elasticsearch integration for PsychedCMS — indexing, search, autocomplete, and facets",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
             "name": "psychedcms/psychedcms-taxonomy",
-            "version": "dev-main",
+            "version": "dev-feature/ci-solution",
             "dist": {
                 "type": "path",
                 "url": "../packages/psychedcms-taxonomy",
-                "reference": "95db09750a2221a325f0a1d2e4b3419775d0b3c0"
+                "reference": "a08b39312a022ea09ad52a6b726f1357a9f6dad9"
             },
             "require": {
                 "api-platform/core": "^4.2",
@@ -2885,11 +2931,11 @@
         },
         {
             "name": "psychedcms/psychedcms-translatable",
-            "version": "dev-master",
+            "version": "dev-feature/ci-solution",
             "dist": {
                 "type": "path",
                 "url": "../packages/psychedcms-translatable",
-                "reference": "127cf7314457e9d00b6b65101c22a7a4ef5b2901"
+                "reference": "dbe4505da9223cd91f75753b14fd261ea148e735"
             },
             "require": {
                 "gedmo/doctrine-extensions": "^3.0",
@@ -2930,11 +2976,11 @@
         },
         {
             "name": "psychedcms/psychedcms-workflow",
-            "version": "dev-main",
+            "version": "dev-feature/collection-field",
             "dist": {
                 "type": "path",
                 "url": "../packages/psychedcms-workflow",
-                "reference": "9f5a4c59c2ca202aefc4a207c53d455fe9248b95"
+                "reference": "c9c98885334f9c055f27e308731838906c6196d1"
             },
             "require": {
                 "php": ">=8.2",
@@ -9439,6 +9485,7 @@
         "psychedcms/psychedcms-media": 20,
         "psychedcms/psychedcms-taxonomy": 20,
         "psychedcms/psychedcms-translatable": 20,
+        "psychedcms/psychedcms-search": 20,
         "psychedcms/psychedcms-workflow": 20
     },
     "prefer-stable": true,
@@ -9448,6 +9495,6 @@
         "ext-ctype": "*",
         "ext-iconv": "*"
     },
-    "platform-dev": {},
-    "plugin-api-version": "2.9.0"
+    "platform-dev": [],
+    "plugin-api-version": "2.2.0"
 }

@@ -22,6 +22,8 @@ use PsychedCms\Core\Attribute\Field\TextareaField;
 use PsychedCms\Core\Attribute\Field\TextField;
 use PsychedCms\Core\Attribute\Field\UrlField;
 use PsychedCms\Geolocation\Attribute\GeolocationField;
+use PsychedCms\Search\Attribute\Indexed;
+use PsychedCms\Search\Attribute\IndexedField;
 use PsychedCms\Core\Content\ContentTrait;
 use PsychedCms\Core\Content\TranslatableInterface;
 use PsychedCms\Core\Content\TranslatableTrait;
@@ -44,6 +46,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiFilter(TaxonomySlugFilter::class, properties: ['tags'])]
 #[ContentType(icon: 'Article', locales: ['en', 'fr'])]
 #[Gedmo\TranslationEntity(class: PostTranslation::class)]
+#[Indexed]
 class Post implements PublicationWorkflowAwareInterface, TranslatableInterface
 {
     use ContentTrait;
@@ -54,16 +57,19 @@ class Post implements PublicationWorkflowAwareInterface, TranslatableInterface
     #[Assert\NotBlank]
     #[Gedmo\Translatable]
     #[TextField(label: 'Title', required: true, group: 'content', translatable: true)]
+    #[IndexedField(boost: 3.0, autocomplete: true)]
     private ?string $title = null;
 
     #[ORM\Column(length: 500, nullable: true)]
     #[Gedmo\Translatable]
     #[TextareaField(label: 'Excerpt', group: 'content', translatable: true)]
+    #[IndexedField]
     private ?string $excerpt = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
     #[Gedmo\Translatable]
     #[HtmlField(label: 'Content', group: 'content', translatable: true)]
+    #[IndexedField]
     private ?string $content = null;
 
     #[ORM\ManyToOne(targetEntity: Media::class)]
@@ -79,11 +85,13 @@ class Post implements PublicationWorkflowAwareInterface, TranslatableInterface
     #[ORM\ManyToMany(targetEntity: Taxonomy::class)]
     #[ORM\JoinTable(name: 'post_tags')]
     #[TaxonomyField(taxonomy: 'tags', multiple: true, allowCreate: true, label: 'Tags', group: 'metadata')]
+    #[IndexedField(facetable: true, filterable: true)]
     private Collection $tags;
 
     #[ORM\ManyToMany(targetEntity: Genre::class)]
     #[ORM\JoinTable(name: 'post_genres')]
     #[EntityTaxonomyField(multiple: true, label: 'Genres', group: 'metadata')]
+    #[IndexedField(facetable: true, filterable: true)]
     private Collection $genres;
 
     #[ORM\ManyToMany(targetEntity: Post::class)]
@@ -109,10 +117,12 @@ class Post implements PublicationWorkflowAwareInterface, TranslatableInterface
 
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
     #[DateField(mode: 'datetime', label: 'Event Date & Time', group: 'metadata')]
+    #[IndexedField(type: 'date', filterable: true, sortable: true)]
     private ?\DateTimeImmutable $eventDate = null;
 
     #[ORM\Column(type: 'json', nullable: true)]
     #[GeolocationField(label: 'Location', group: 'metadata')]
+    #[IndexedField(type: 'geo_point')]
     private ?array $location = null;
 
     /** @var Collection<int, PostTranslation> */
