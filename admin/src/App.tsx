@@ -3,38 +3,11 @@ import { HydraAdmin, hydraDataProvider, ResourceGuesser } from '@api-platform/ad
 import { CustomRoutes } from 'react-admin';
 import type { Resource } from '@api-platform/api-doc-parser';
 
-import { freezeRegistry, registerPlugin, AppWrapperSlot, renderSettingsRoutes } from '@psychedcms/admin-core';
+import { freezeRegistry, AppWrapperSlot, renderSettingsRoutes, useLocaleSettings } from '@psychedcms/admin-core';
 
 // Register plugins — side-effect imports trigger registerPlugin()
 import '@psychedcms/admin-translatable';
 import { getCurrentEditLocale } from '@psychedcms/admin-translatable';
-
-import { GlobalSettings } from './components/settings/GlobalSettings.tsx';
-import { PreferencesSettings } from './components/settings/PreferencesSettings.tsx';
-import { useLocaleSettings } from './hooks/useLocaleSettings.ts';
-
-import PublicIcon from '@mui/icons-material/Public';
-import TuneIcon from '@mui/icons-material/Tune';
-
-// Register shell-level settings pages
-registerPlugin({
-  settingsPages: [
-    {
-      path: 'global',
-      component: GlobalSettings,
-      menuLabel: 'Global',
-      menuIcon: PublicIcon,
-      menuSection: 'global',
-    },
-    {
-      path: 'preferences',
-      component: PreferencesSettings,
-      menuLabel: 'Preferences',
-      menuIcon: TuneIcon,
-      menuSection: 'global',
-    },
-  ],
-});
 
 import { PsychedSchemaProvider } from './providers/PsychedSchemaProvider.tsx';
 import { createI18nProvider } from './providers/i18nProvider.ts';

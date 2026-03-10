@@ -401,3 +401,73 @@ tasks:
     cmds:
       - git -C {{.PACKAGES_DIR}}/psychedcms-calendar branch -d feature/{{.FEATURE}} || true
       - git -C {{.PACKAGES_DIR}}/psychedcms-calendar push origin --delete feature/{{.FEATURE}} || true
+
+  # ===========================================================================
+  # Git - psychedcms-admin-core (atomic operations)
+  # ===========================================================================
+  git:status:admin-core:
+    desc: Show git status for psychedcms-admin-core
+    cmds:
+      - echo "=== psychedcms-admin-core ===" && git -C {{.PACKAGES_DIR}}/psychedcms-admin-core status -s && git -C {{.PACKAGES_DIR}}/psychedcms-admin-core log -1 --oneline
+
+  git:branch:admin-core:
+    desc: Show current branch for psychedcms-admin-core
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-admin-core branch --show-current
+
+  commit:admin-core:
+    desc: "Commit psychedcms-admin-core on current branch"
+    vars:
+      MESSAGE: '{{.MESSAGE}}'
+    cmds:
+      - cmd: 'git -C {{.PACKAGES_DIR}}/psychedcms-admin-core add .'
+      - cmd: 'git -C {{.PACKAGES_DIR}}/psychedcms-admin-core commit -m "{{.MESSAGE}}"'
+
+  push:admin-core:
+    desc: Push psychedcms-admin-core current branch
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-admin-core push -u origin $(git -C {{.PACKAGES_DIR}}/psychedcms-admin-core branch --show-current)
+
+  pull:admin-core:
+    desc: 'Pull psychedcms-admin-core (current branch or specified via BRANCH=x)'
+    vars:
+      BRANCH:
+        sh: echo "${BRANCH:-$(git -C {{.PACKAGES_DIR}}/psychedcms-admin-core branch --show-current)}"
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-admin-core checkout {{.BRANCH}}
+      - git -C {{.PACKAGES_DIR}}/psychedcms-admin-core pull origin {{.BRANCH}}
+
+  # ===========================================================================
+  # Git - psychedcms-admin-translatable (atomic operations)
+  # ===========================================================================
+  git:status:admin-translatable:
+    desc: Show git status for psychedcms-admin-translatable
+    cmds:
+      - echo "=== psychedcms-admin-translatable ===" && git -C {{.PACKAGES_DIR}}/psychedcms-admin-translatable status -s && git -C {{.PACKAGES_DIR}}/psychedcms-admin-translatable log -1 --oneline
+
+  git:branch:admin-translatable:
+    desc: Show current branch for psychedcms-admin-translatable
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-admin-translatable branch --show-current
+
+  commit:admin-translatable:
+    desc: "Commit psychedcms-admin-translatable on current branch"
+    vars:
+      MESSAGE: '{{.MESSAGE}}'
+    cmds:
+      - cmd: 'git -C {{.PACKAGES_DIR}}/psychedcms-admin-translatable add .'
+      - cmd: 'git -C {{.PACKAGES_DIR}}/psychedcms-admin-translatable commit -m "{{.MESSAGE}}"'
+
+  push:admin-translatable:
+    desc: Push psychedcms-admin-translatable current branch
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-admin-translatable push -u origin $(git -C {{.PACKAGES_DIR}}/psychedcms-admin-translatable branch --show-current)
+
+  pull:admin-translatable:
+    desc: 'Pull psychedcms-admin-translatable (current branch or specified via BRANCH=x)'
+    vars:
+      BRANCH:
+        sh: echo "${BRANCH:-$(git -C {{.PACKAGES_DIR}}/psychedcms-admin-translatable branch --show-current)}"
+    cmds:
+      - git -C {{.PACKAGES_DIR}}/psychedcms-admin-translatable checkout {{.BRANCH}}
+      - git -C {{.PACKAGES_DIR}}/psychedcms-admin-translatable pull origin {{.BRANCH}}

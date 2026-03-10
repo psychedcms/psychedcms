@@ -15,6 +15,7 @@ use PsychedCms\Core\Attribute\ContentType;
 use PsychedCms\Core\Attribute\Field\HtmlField;
 use PsychedCms\Core\Attribute\Field\TextField;
 use PsychedCms\Core\Attribute\Field\TextareaField;
+use PsychedCms\Core\Attribute\Field\RelationField;
 use PsychedCms\Core\Content\ContentTrait;
 use PsychedCms\Core\Content\TranslatableInterface;
 use PsychedCms\Core\Content\TranslatableTrait;
@@ -58,6 +59,7 @@ class Page implements PublicationWorkflowAwareInterface, TranslatableInterface
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: true)]
+    #[RelationField(reference: 'users', displayField: 'email', label: 'Author', group: 'sidebar')]
     private ?User $author = null;
 
     /** @var Collection<int, PageTranslation> */

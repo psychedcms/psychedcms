@@ -18,8 +18,8 @@ interface ContentFormProps {
   translatableSaveRef?: MutableRefObject<TranslatableSaveHandle | null>;
 }
 
-// Fields handled by the sidebar, excluded from main form
-const SIDEBAR_FIELDS = new Set(['status', 'publishedAt', 'depublishedAt', 'author']);
+// Fields always handled by the sidebar, excluded from main form
+const HARDCODED_SIDEBAR_FIELDS = new Set(['status', 'publishedAt', 'depublishedAt']);
 
 function humanizeGroupName(group: string): string {
   const abbreviations: Record<string, string> = {
@@ -141,6 +141,10 @@ export function ContentForm({ resource: resourceProp, translatableSaveRef }: Con
   );
 }
 
+function isSidebarField(fieldName: string, metadata: { group?: string }): boolean {
+  return HARDCODED_SIDEBAR_FIELDS.has(fieldName) || metadata.group === 'sidebar';
+}
+
 function groupFieldsByGroup(
   fields: Map<string, { group?: string }> | undefined
 ): Map<string, string[]> {
@@ -149,7 +153,7 @@ function groupFieldsByGroup(
   if (!fields) return groups;
 
   for (const [fieldName, metadata] of fields) {
-    if (SIDEBAR_FIELDS.has(fieldName)) {
+    if (isSidebarField(fieldName, metadata)) {
       continue;
     }
 
@@ -172,7 +176,7 @@ function getGroupOrder(fields: Map<string, { group?: string }> | undefined): str
   if (!fields) return order;
 
   for (const [fieldName, metadata] of fields) {
-    if (SIDEBAR_FIELDS.has(fieldName)) {
+    if (isSidebarField(fieldName, metadata)) {
       continue;
     }
 

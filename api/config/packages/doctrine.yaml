@@ -24,6 +24,12 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Entity'
                 prefix: 'App\Entity'
                 alias: App
+            PsychedCmsSettings:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/../packages/psychedcms-core/src/Settings/Entity'
+                prefix: 'PsychedCms\Core\Settings\Entity'
+                alias: PsychedCmsSettings
         controller_resolver:
             auto_mapping: false
 

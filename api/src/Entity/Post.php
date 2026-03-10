@@ -73,6 +73,7 @@ class Post implements PublicationWorkflowAwareInterface, TranslatableInterface
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: true)]
+    #[RelationField(reference: 'users', displayField: 'email', label: 'Author', group: 'sidebar')]
     private ?User $author = null;
 
     #[ORM\ManyToMany(targetEntity: Taxonomy::class)]

@@ -11,8 +11,6 @@ import StarIcon from '@mui/icons-material/Star';
 import {
   useRecordContext,
   SelectInput,
-  ReferenceInput,
-  AutocompleteInput,
   SaveButton,
   DeleteButton,
   useResourceContext,
@@ -27,6 +25,8 @@ import { formatDistanceToNow, type Locale as DateFnsLocale } from 'date-fns';
 import { fr } from 'date-fns/locale/fr';
 import { WorkflowButton } from './WorkflowButton.tsx';
 import { SidebarSlot } from '@psychedcms/admin-core';
+import { usePsychedSchema } from '../../hooks/usePsychedSchema.ts';
+import { PsychedInputGuesser } from '../inputs/PsychedInputGuesser.tsx';
 
 function useStatusChoices() {
   const translate = useTranslate();
@@ -95,6 +95,9 @@ interface EditSidebarProps {
 /**
  * Sidebar for edit forms with save button and publication options.
  */
+// Fields that are always rendered explicitly in the sidebar
+const HARDCODED_SIDEBAR_FIELDS = new Set(['status', 'publishedAt', 'depublishedAt']);
+
 export function EditSidebar({ resource: resourceProp }: EditSidebarProps) {
   const record = useRecordContext();
   const resourceFromContext = useResourceContext();
@@ -102,6 +105,14 @@ export function EditSidebar({ resource: resourceProp }: EditSidebarProps) {
   const translate = useTranslate();
   const [uiLocale] = useLocaleState();
   const statusChoices = useStatusChoices();
+  const resourceSchema = usePsychedSchema(resource ?? '');
+
+  // Collect schema fields with group === 'sidebar' that aren't hardcoded
+  const sidebarFields = resourceSchema?.fields
+    ? [...resourceSchema.fields.entries()].filter(
+        ([source, meta]) => meta.group === 'sidebar' && !HARDCODED_SIDEBAR_FIELDS.has(source),
+      )
+    : [];
 
   if (!record) {
     return null;
@@ -186,17 +197,9 @@ export function EditSidebar({ resource: resourceProp }: EditSidebarProps) {
               label={translate('psyched.fields.depublished_at', { _: 'Depublished at' })}
             />
 
-            {resource === 'posts' && (
-              <ReferenceInput source="author" reference="users">
-                <AutocompleteInput
-                  label={translate('psyched.fields.author', { _: 'Author' })}
-                  optionText="email"
-                  fullWidth
-                  helperText={false}
-                  size="small"
-                />
-              </ReferenceInput>
-            )}
+            {sidebarFields.map(([source]) => (
+              <PsychedInputGuesser key={source} source={source} resource={resource ?? ''} />
+            ))}
           </Box>
         </CardContent>
       </Card>

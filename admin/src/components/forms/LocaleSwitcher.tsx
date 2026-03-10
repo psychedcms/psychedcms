@@ -4,7 +4,7 @@ import { useResourceContext } from 'react-admin';
 
 import { useEditLocale } from '../../providers/EditLocaleContext.tsx';
 import { usePsychedSchema } from '../../hooks/usePsychedSchema.ts';
-import { useLocaleSettings } from '../../hooks/useLocaleSettings.ts';
+import { useLocaleSettings } from '@psychedcms/admin-core';
 
 /**
  * Locale switcher for the edit sidebar.
