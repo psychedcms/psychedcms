@@ -40,7 +40,7 @@ final class Version20260125215823 extends AbstractMigration
         $this->addSql('ALTER TABLE posts ADD CONSTRAINT FK_885DBAFAF675F31B FOREIGN KEY (author_id) REFERENCES users (id) NOT DEFERRABLE');
 
         // Drop legacy article table
-        $this->addSql('DROP TABLE article');
+        $this->addSql('DROP TABLE IF EXISTS article');
     }
 
     public function down(Schema $schema): void
