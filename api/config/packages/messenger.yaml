@@ -1,0 +1,17 @@
+framework:
+    messenger:
+        failure_transport: failed
+
+        transports:
+            async: '%env(MESSENGER_TRANSPORT_DSN)%'
+            failed: 'doctrine://default?queue_name=failed'
+            sync: 'sync://'
+
+        routing:
+            # Calendar and Workflow messages are routed by bundle configs
+
+when@test:
+    framework:
+        messenger:
+            transports:
+                async: 'in-memory://'
